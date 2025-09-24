@@ -65,7 +65,10 @@ class MyRecipesPage {
             
             if (authButtons) authButtons.style.display = 'none';
             if (userMenu) userMenu.style.display = 'flex';
-            if (userName) userName.textContent = window.authManager.getUser().full_name || window.authManager.getUser().email;
+            if (userName && window.authManager) {
+                const user = window.authManager.getUser();
+                userName.textContent = user ? (user.full_name || user.email) : 'User';
+            }
             
             console.log('User is authenticated, showing user menu');
         } else {
