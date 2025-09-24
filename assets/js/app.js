@@ -12,6 +12,7 @@ class RecipeFinderApp {
         this.bindEvents();
         this.updateUI();
         this.displayRecipes(this.currentRecipes);
+        this.initializeLazyLoading();
         console.log('🍳 Recipe Finder App initialized');
     }
 
@@ -27,6 +28,11 @@ class RecipeFinderApp {
                 this.addIngredient();
             }
         });
+
+        // Debounced search for ingredient suggestions
+        ingredientInput.addEventListener('input', this.debounce((e) => {
+            this.handleIngredientInput(e);
+        }, 300));
 
         // Image upload event
         const imageInput = document.getElementById('image-input');
@@ -226,7 +232,7 @@ class RecipeFinderApp {
             }
         } catch (error) {
             console.error('Recipe generation error:', error);
-            this.showError('An error occurred while generating recipes');
+            this.showError('An error occurred while generating recipes. Please try again.');
         } finally {
             this.hideLoading();
         }
@@ -251,6 +257,9 @@ class RecipeFinderApp {
 
         resultsSection.style.display = 'block';
         resultsSection.scrollIntoView({ behavior: 'smooth' });
+        
+        // Initialize lazy loading for new images
+        this.initializeLazyLoading();
     }
 
     createRecipeCard(recipe) {
@@ -268,9 +277,10 @@ class RecipeFinderApp {
         const missingCount = missingIngredients.length || recipe.missedIngredientCount || 0;
 
         card.innerHTML = `
-            <img src="${this.getRecipeImageUrl(recipe)}"
+            <img data-src="${this.getRecipeImageUrl(recipe)}"
                  alt="${recipe.title}"
-                 class="recipe-image"
+                 class="recipe-image lazy-load"
+                 src="https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Loading..."
                  onload="console.log('✅ Image loaded successfully:', this.src)"
                  onerror="console.error('❌ Image failed to load:', this.src); this.src='https://via.placeholder.com/300x200/667eea/ffffff?text=Recipe'"
 
@@ -735,6 +745,107 @@ class RecipeFinderApp {
             this.currentRecipes = [];
         }
         return [];
+    }
+
+    // Lazy Loading Implementation
+    initializeLazyLoading() {
+        const lazyImages = document.querySelectorAll('img[data-src]');
+        
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy-load');
+                        img.classList.add('loaded');
+                        observer.unobserve(img);
+                        
+                        console.log('🖼️ Lazy loaded image:', img.src);
+                    }
+                });
+            }, {
+                rootMargin: '50px 0px', // Start loading 50px before image comes into view
+                threshold: 0.1
+            });
+
+            lazyImages.forEach(img => imageObserver.observe(img));
+        } else {
+            // Fallback for older browsers
+            lazyImages.forEach(img => {
+                img.src = img.dataset.src;
+                img.classList.remove('lazy-load');
+                img.classList.add('loaded');
+            });
+        }
+    }
+
+    // Utility Functions
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    handleIngredientInput(e) {
+        const value = e.target.value.trim();
+        if (value.length > 2) {
+            // Could implement ingredient suggestions here
+            console.log('🔍 Ingredient input:', value);
+        }
+    }
+
+    // Enhanced Error Handling
+    showNotification(message, type = 'info', duration = 5000) {
+        // Remove existing notifications
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => notification.remove());
+
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <span class="notification-message">${message}</span>
+                <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+
+        // Add to page
+        document.body.appendChild(notification);
+
+        // Auto-remove after duration
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, duration);
+
+        // Animate in
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+    }
+
+    showSuccess(message) {
+        this.showNotification(message, 'success', 3000);
+    }
+
+    showError(message) {
+        this.showNotification(message, 'error', 7000);
+    }
+
+    showWarning(message) {
+        this.showNotification(message, 'warning', 5000);
+    }
+
+    showInfo(message) {
+        this.showNotification(message, 'info', 4000);
     }
 
     // Save Recipe Method (called from button)

@@ -744,6 +744,18 @@ body {
     width: 100%;
     height: 200px;
     object-fit: cover;
+    transition: opacity 0.3s ease;
+}
+
+/* Lazy loading styles */
+.recipe-image.lazy-load {
+    opacity: 0.7;
+    filter: blur(2px);
+}
+
+.recipe-image.loaded {
+    opacity: 1;
+    filter: none;
 }
 
 .recipe-content {
@@ -1301,4 +1313,143 @@ body {
 
 .hidden {
     display: none !important;
+}
+
+/* Notification System */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    max-width: 400px;
+    min-width: 300px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.notification.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-radius: 8px;
+}
+
+.notification-message {
+    flex: 1;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 12px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.notification-close:hover {
+    opacity: 1;
+}
+
+/* Notification Types */
+.notification-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.notification-error {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.notification-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.notification-info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+}
+
+/* Mobile notifications */
+@media (max-width: 768px) {
+    .notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        min-width: auto;
+    }
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+    .ingredient-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    .recipe-card {
+        /* Better touch feedback */
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+        touch-action: manipulation;
+        min-height: 44px;
+    }
+
+    .recipe-card:active {
+        transform: scale(0.98);
+    }
+
+    /* Improved form inputs for mobile */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    /* Better modal handling on mobile */
+    .modal {
+        padding: 1rem;
+    }
+
+    .modal-content {
+        border-radius: 12px;
+    }
+
+    /* Improved navigation for mobile */
+    .nav-link {
+        padding: 12px 16px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Better touch targets */
+    .btn {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ingredient-tag {
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+    }
 }
