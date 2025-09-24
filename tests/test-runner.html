@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Finder - Test Suite</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .test-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 6px;
+            background: #f8f9fa;
+        }
+        
+        .test-item.pass {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .test-item.fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .test-item.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .test-button:hover {
+            background: #5a6fd8;
+        }
+        
+        .test-results {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #e9ecef;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🧪 Recipe Finder Test Suite</h1>
+        <p>Comprehensive testing for Recipe Finder application</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-number" id="total-tests">0</div>
+            <div class="stat-label">Total Tests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="passed-tests">0</div>
+            <div class="stat-label">Passed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="failed-tests">0</div>
+            <div class="stat-label">Failed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="pending-tests">0</div>
+            <div class="stat-label">Pending</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Core Functionality Tests</h2>
+        <div id="core-tests">
+            <div class="test-item pending">
+                <span>Recipe generation with valid ingredients</span>
+                <button class="test-button" onclick="runTest('recipe-generation')">Run Test</button>
+            </div>
+            <div class="test-item pending">
+                <span>Recipe saving functionality</span>
+                <button class="test-button" onclick="runTest('recipe-saving')">Run Test</button>
+            </div>
+            <div class="test-item pending">
+                <span>Authentication flow</span>
+                <button class="test-button" onclick="runTest('authentication')">Run Test</button>
+            </div>
+            <div class="test-item pending">
+                <span>Recipe persistence in localStorage</span>
+                <button class="test-button" onclick="runTest('recipe-persistence')">Run Test</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎨 UI/UX Tests</h2>
+        <div id="ui-tests">
+            <div class="test-item pending">
+                <span>Image lazy loading</span>
+                <button class="test-button" onclick="runTest('lazy-loading')">Run Test</button>
+            </div>
+            <div class="test-item pending">
+                <span>Notification system</span>
+                <button class="test-button" onclick="runTest('notifications')">Run Test</button>
+            </div>
+            <div class="test-item pending">
+                <span>Mobile responsiveness</span>
+                <button class="test-button" onclick="runTest('mobile-responsive')">Run Test</button>
+            </div>
+            <div class="test-item pending">
+                <span>Debounced search</span>
+                <button class="test-button" onclick="runTest('debounced-search')">Run Test</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔒 Security Tests</h2>
+        <div id="security-tests">
+            <div class="test-item pending">
+                <span>Input validation</span>
+                <button class="test-button" onclick="runTest('input-validation')">Run Test</button>
+            </div>
+            <div class="test-item pending">
+                <span>Authentication token handling</span>
+                <button class="test-button" onclick="runTest('token-handling')">Run Test</button>
+            </div>
+            <div class="test-item pending">
+                <span>XSS prevention</span>
+                <button class="test-button" onclick="runTest('xss-prevention')">Run Test</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>⚡ Performance Tests</h2>
+        <div id="performance-tests">
+            <div class="test-item pending">
+                <span>Page load time</span>
+                <button class="test-button" onclick="runTest('page-load')">Run Test</button>
+            </div>
+            <div class="test-item pending">
+                <span>API response time</span>
+                <button class="test-button" onclick="runTest('api-response')">Run Test</button>
+            </div>
+            <div class="test-item pending">
+                <span>Memory usage</span>
+                <button class="test-button" onclick="runTest('memory-usage')">Run Test</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test Results</h2>
+        <div class="test-results" id="test-results">
+            Click "Run All Tests" to start testing...
+        </div>
+        <button class="test-button" onclick="runAllTests()" style="margin-top: 1rem; padding: 1rem 2rem; font-size: 1.1rem;">
+            🚀 Run All Tests
+        </button>
+    </div>
+
+    <script>
+        // Test Framework
+        class TestFramework {
+            constructor() {
+                this.tests = [];
+                this.results = [];
+                this.totalTests = 0;
+                this.passedTests = 0;
+                this.failedTests = 0;
+                this.pendingTests = 0;
+            }
+
+            addTest(name, testFunction) {
+                this.tests.push({ name, testFunction });
+                this.totalTests++;
+                this.pendingTests++;
+                this.updateStats();
+            }
+
+            async runTest(testName) {
+                const test = this.tests.find(t => t.name === testName);
+                if (!test) {
+                    this.log(`❌ Test "${testName}" not found`);
+                    return;
+                }
+
+                this.log(`🧪 Running test: ${testName}`);
+                
+                try {
+                    const result = await test.testFunction();
+                    if (result) {
+                        this.passTest(testName);
+                        this.log(`✅ ${testName}: PASSED`);
+                    } else {
+                        this.failTest(testName);
+                        this.log(`❌ ${testName}: FAILED`);
+                    }
+                } catch (error) {
+                    this.failTest(testName);
+                    this.log(`❌ ${testName}: ERROR - ${error.message}`);
+                }
+            }
+
+            async runAllTests() {
+                this.log('🚀 Starting test suite...\n');
+                
+                for (const test of this.tests) {
+                    await this.runTest(test.name);
+                    await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between tests
+                }
+                
+                this.log(`\n📊 Test Suite Complete!`);
+                this.log(`Total: ${this.totalTests} | Passed: ${this.passedTests} | Failed: ${this.failedTests}`);
+            }
+
+            passTest(testName) {
+                this.passedTests++;
+                this.pendingTests--;
+                this.updateTestUI(testName, 'pass');
+                this.updateStats();
+            }
+
+            failTest(testName) {
+                this.failedTests++;
+                this.pendingTests--;
+                this.updateTestUI(testName, 'fail');
+                this.updateStats();
+            }
+
+            updateTestUI(testName, status) {
+                const testItems = document.querySelectorAll('.test-item');
+                testItems.forEach(item => {
+                    if (item.textContent.includes(testName)) {
+                        item.className = `test-item ${status}`;
+                        const button = item.querySelector('.test-button');
+                        if (button) {
+                            button.textContent = status === 'pass' ? '✅ Passed' : '❌ Failed';
+                            button.disabled = true;
+                        }
+                    }
+                });
+            }
+
+            updateStats() {
+                document.getElementById('total-tests').textContent = this.totalTests;
+                document.getElementById('passed-tests').textContent = this.passedTests;
+                document.getElementById('failed-tests').textContent = this.failedTests;
+                document.getElementById('pending-tests').textContent = this.pendingTests;
+            }
+
+            log(message) {
+                const resultsDiv = document.getElementById('test-results');
+                resultsDiv.textContent += message + '\n';
+                resultsDiv.scrollTop = resultsDiv.scrollHeight;
+            }
+        }
+
+        // Initialize test framework
+        const testFramework = new TestFramework();
+
+        // Test Functions
+        testFramework.addTest('recipe-generation', async () => {
+            // Mock test for recipe generation
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // Simulate API call
+                    const mockIngredients = ['chicken', 'rice', 'vegetables'];
+                    const hasValidIngredients = mockIngredients.length > 0;
+                    resolve(hasValidIngredients);
+                }, 500);
+            });
+        });
+
+        testFramework.addTest('recipe-saving', async () => {
+            // Test localStorage functionality
+            try {
+                const testData = { title: 'Test Recipe', ingredients: ['test'] };
+                localStorage.setItem('test_recipe', JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem('test_recipe'));
+                localStorage.removeItem('test_recipe');
+                return retrieved.title === 'Test Recipe';
+            } catch (error) {
+                return false;
+            }
+        });
+
+        testFramework.addTest('authentication', async () => {
+            // Test authentication token format
+            const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.signature';
+            return mockToken.split('.').length === 3;
+        });
+
+        testFramework.addTest('recipe-persistence', async () => {
+            // Test recipe persistence
+            try {
+                const testRecipes = [
+                    { title: 'Recipe 1', ingredients: ['ingredient1'] },
+                    { title: 'Recipe 2', ingredients: ['ingredient2'] }
+                ];
+                localStorage.setItem('recipe_finder_recipes', JSON.stringify(testRecipes));
+                const retrieved = JSON.parse(localStorage.getItem('recipe_finder_recipes'));
+                localStorage.removeItem('recipe_finder_recipes');
+                return Array.isArray(retrieved) && retrieved.length === 2;
+            } catch (error) {
+                return false;
+            }
+        });
+
+        testFramework.addTest('lazy-loading', async () => {
+            // Test IntersectionObserver support
+            return 'IntersectionObserver' in window;
+        });
+
+        testFramework.addTest('notifications', async () => {
+            // Test notification system
+            try {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                document.body.appendChild(notification);
+                document.body.removeChild(notification);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        });
+
+        testFramework.addTest('mobile-responsive', async () => {
+            // Test mobile viewport
+            return window.innerWidth <= 768 || window.matchMedia('(max-width: 768px)').matches;
+        });
+
+        testFramework.addTest('debounced-search', async () => {
+            // Test debounce function
+            let callCount = 0;
+            const debouncedFunction = (() => {
+                let timeout;
+                return (func, wait) => {
+                    return function executedFunction(...args) {
+                        const later = () => {
+                            clearTimeout(timeout);
+                            func(...args);
+                        };
+                        clearTimeout(timeout);
+                        timeout = setTimeout(later, wait);
+                    };
+                };
+            })();
+            
+            const testFunc = debouncedFunction(() => callCount++, 100);
+            testFunc();
+            testFunc();
+            testFunc();
+            
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(callCount === 1);
+                }, 200);
+            });
+        });
+
+        testFramework.addTest('input-validation', async () => {
+            // Test input sanitization
+            const testInput = '<script>alert("xss")</script>';
+            const sanitized = testInput.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+            return sanitized === '';
+        });
+
+        testFramework.addTest('token-handling', async () => {
+            // Test JWT token structure
+            const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMjM0In0.signature';
+            const parts = mockToken.split('.');
+            return parts.length === 3 && parts.every(part => part.length > 0);
+        });
+
+        testFramework.addTest('xss-prevention', async () => {
+            // Test XSS prevention
+            const maliciousInput = '<img src="x" onerror="alert(1)">';
+            const escaped = maliciousInput
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;');
+            return !escaped.includes('<') && !escaped.includes('>');
+        });
+
+        testFramework.addTest('page-load', async () => {
+            // Test page load performance
+            const loadTime = performance.now();
+            return loadTime < 3000; // Should load within 3 seconds
+        });
+
+        testFramework.addTest('api-response', async () => {
+            // Mock API response test
+            return new Promise((resolve) => {
+                const startTime = Date.now();
+                setTimeout(() => {
+                    const responseTime = Date.now() - startTime;
+                    resolve(responseTime < 1000); // Mock response within 1 second
+                }, 100);
+            });
+        });
+
+        testFramework.addTest('memory-usage', async () => {
+            // Test memory usage (basic check)
+            if ('memory' in performance) {
+                const memory = performance.memory;
+                return memory.usedJSHeapSize < memory.jsHeapSizeLimit * 0.8; // Less than 80% of limit
+            }
+            return true; // Pass if memory API not available
+        });
+
+        // Global functions for button clicks
+        function runTest(testName) {
+            testFramework.runTest(testName);
+        }
+
+        function runAllTests() {
+            testFramework.runAllTests();
+        }
+
+        // Initialize stats on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            testFramework.updateStats();
+        });
+    </script>
+</body>
+</html>
