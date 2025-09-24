@@ -318,12 +318,17 @@ class MyRecipesPage {
     }
 
     async deleteRecipe(recipeId, recipeTitle) {
+        console.log('🗑️ Delete recipe called:', { recipeId, recipeTitle });
+        
         if (!confirm(`Are you sure you want to delete "${recipeTitle}"?`)) {
             return;
         }
 
         try {
+            console.log('🗑️ Calling delete API for recipe ID:', recipeId);
             const result = await window.savedRecipesAPI.deleteRecipe(recipeId);
+            
+            console.log('🗑️ Delete API result:', result);
             
             if (result.success) {
                 this.showSuccess('Recipe deleted successfully!');

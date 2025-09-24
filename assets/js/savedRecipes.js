@@ -49,6 +49,13 @@ class SavedRecipesAPI {
             const result = await response.json();
             
             if (!response.ok) {
+                // Handle 409 (Conflict) as a special case for duplicate recipes
+                if (response.status === 409) {
+                    return {
+                        success: false,
+                        error: 'Recipe already saved'
+                    };
+                }
                 throw new Error(result.error || 'Failed to save recipe');
             }
 

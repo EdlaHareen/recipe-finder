@@ -865,9 +865,14 @@ class RecipeFinderApp {
             }
 
             // Check if recipe is already saved
+            console.log('🔍 Checking if recipe is already saved:', recipeTitle);
             const checkResult = await window.savedRecipesAPI.checkIfSaved(recipeTitle);
+            console.log('🔍 Check result:', checkResult);
+            
             if (checkResult.data.isSaved) {
+                console.log('⚠️ Recipe already saved, showing warning');
                 this.showWarning('Recipe is already saved!');
+                this.updateSaveButton(recipeTitle, true);
                 return;
             }
 
@@ -880,7 +885,13 @@ class RecipeFinderApp {
                 // Update the save button to show it's saved
                 this.updateSaveButton(recipeTitle, true);
             } else {
-                this.showError(result.error || 'Failed to save recipe');
+                // Check if it's a duplicate error
+                if (result.error && result.error.includes('already saved')) {
+                    this.showWarning('Recipe is already saved!');
+                    this.updateSaveButton(recipeTitle, true);
+                } else {
+                    this.showError(result.error || 'Failed to save recipe');
+                }
             }
         } catch (error) {
             console.error('Error saving recipe:', error);
