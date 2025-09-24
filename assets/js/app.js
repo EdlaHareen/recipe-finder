@@ -502,9 +502,15 @@ class RecipeFinderApp {
     }
 
     getRecipeImageUrl(recipe) {
-        // Check for DALL-E 3 generated images first
+        // Check for local image URLs first (new system)
         if (recipe.imageUrl && recipe.imageUrl !== '') {
-            // If it's a DALL-E URL, use our backend proxy
+            // If it's a local upload URL, use it directly
+            if (recipe.imageUrl.startsWith('/uploads/')) {
+                const localUrl = `${CONFIG.API.BASE_URL}${recipe.imageUrl}`;
+                console.log(`🖼️ Using local stored image for "${recipe.title}": ${localUrl}`);
+                return localUrl;
+            }
+            // If it's a DALL-E URL (legacy), use our backend proxy
             if (recipe.imageUrl.includes('oaidalleapiprodscus.blob.core.windows.net')) {
                 // Extract the full path after /private/ from DALL-E URL
                 const urlParts = recipe.imageUrl.split('/private/');
@@ -521,7 +527,13 @@ class RecipeFinderApp {
 
         // Check for legacy image field
         if (recipe.image && recipe.image !== '') {
-            // If it's a DALL-E URL, use our backend proxy
+            // If it's a local upload URL, use it directly
+            if (recipe.image.startsWith('/uploads/')) {
+                const localUrl = `${CONFIG.API.BASE_URL}${recipe.image}`;
+                console.log(`🖼️ Using local stored image for "${recipe.title}": ${localUrl}`);
+                return localUrl;
+            }
+            // If it's a DALL-E URL (legacy), use our backend proxy
             if (recipe.image.includes('oaidalleapiprodscus.blob.core.windows.net')) {
                 // Extract the full path after /private/ from DALL-E URL
                 const urlParts = recipe.image.split('/private/');

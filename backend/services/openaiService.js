@@ -1,4 +1,7 @@
 const OpenAI = require('openai');
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
 class OpenAIService {
     constructor() {
@@ -329,10 +332,17 @@ Provide specific suggestions for improvements in JSON format:
                 style: "natural"
             });
 
+            const dalleImageUrl = response.data[0].url;
+            console.log(`📥 DALL-E image generated: ${dalleImageUrl}`);
+
+            // Download and store the image locally
+            const localImageUrl = await this.downloadAndStoreImage(dalleImageUrl, recipeTitle);
+
             return {
                 success: true,
                 data: {
-                    imageUrl: response.data[0].url,
+                    imageUrl: localImageUrl,
+                    dalleUrl: dalleImageUrl, // Keep original for reference
                     prompt: prompt,
                     generatedAt: new Date().toISOString()
                 }
@@ -356,6 +366,49 @@ Provide specific suggestions for improvements in JSON format:
                 error: error.message,
                 fallback: true
             };
+        }
+    }
+
+    async downloadAndStoreImage(dalleImageUrl, recipeTitle) {
+        try {
+            // Create uploads directory if it doesn't exist
+            const uploadsDir = path.join(process.cwd(), 'uploads');
+            if (!fs.existsSync(uploadsDir)) {
+                fs.mkdirSync(uploadsDir, { recursive: true });
+            }
+
+            // Generate a unique filename
+            const timestamp = Date.now();
+            const sanitizedTitle = recipeTitle.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+            const filename = `recipe_${sanitizedTitle}_${timestamp}.png`;
+            const filepath = path.join(uploadsDir, filename);
+
+            // Download the image from DALL-E
+            console.log(`📥 Downloading image from DALL-E: ${dalleImageUrl}`);
+            const imageResponse = await axios.get(dalleImageUrl, {
+                responseType: 'stream',
+                timeout: 30000 // 30 second timeout
+            });
+
+            // Save the image to local storage
+            const writer = fs.createWriteStream(filepath);
+            imageResponse.data.pipe(writer);
+
+            return new Promise((resolve, reject) => {
+                writer.on('finish', () => {
+                    console.log(`✅ Image saved locally: ${filename}`);
+                    resolve(`/uploads/${filename}`);
+                });
+                writer.on('error', (error) => {
+                    console.error('❌ Error saving image:', error);
+                    reject(error);
+                });
+            });
+
+        } catch (error) {
+            console.error('❌ Error downloading/storing image:', error);
+            // Return a fallback placeholder URL
+            return `https://via.placeholder.com/400x300/667eea/ffffff?text=${encodeURIComponent(recipeTitle.substring(0, 20))}`;
         }
     }
 
