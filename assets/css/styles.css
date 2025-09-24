@@ -1106,15 +1106,29 @@ body {
 }
 
 .ingredients-list-modal {
-    list-style: none;
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin: 1rem 0;
 }
 
 .ingredients-list-modal li {
     padding: 0.5rem 0;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    margin-bottom: 0.25rem;
+    line-height: 1.5;
+    display: list-item;
+    color: #2d3748;
+}
+
+/* Ingredients section in modal */
+.ingredients-section {
+    margin: 1.5rem 0;
+}
+
+.ingredients-section h3 {
+    color: #2d3748;
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
 }
 
 .ingredient-have {

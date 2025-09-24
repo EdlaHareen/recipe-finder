@@ -298,7 +298,7 @@ class MyRecipesPage {
                 ${recipeData.ingredients && recipeData.ingredients.length > 0 ? `
                     <div class="ingredients-section">
                         <h3>Ingredients</h3>
-                        <ul class="ingredients-list">
+                        <ul class="ingredients-list-modal">
                             ${recipeData.ingredients.map(ing => {
                                 // Handle different ingredient formats
                                 let ingredientText = '';
