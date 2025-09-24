@@ -506,30 +506,34 @@ class RecipeFinderApp {
         if (recipe.imageUrl && recipe.imageUrl !== '') {
             // If it's a DALL-E URL, use our backend proxy
             if (recipe.imageUrl.includes('oaidalleapiprodscus.blob.core.windows.net')) {
-                // Extract image ID from DALL-E URL
-                const imageId = recipe.imageUrl.split('/').pop();
-                const proxyUrl = `${CONFIG.API.BASE_URL}/images/proxy/${imageId}`;
-                console.log(`🖼️ Using DALL-E 3 generated image via proxy for "${recipe.title}": ${proxyUrl}`);
-                return proxyUrl;
-            } else {
-                console.log(`🖼️ Using DALL-E 3 generated image for "${recipe.title}": ${recipe.imageUrl}`);
-                return recipe.imageUrl;
+                // Extract the full path after /private/ from DALL-E URL
+                const urlParts = recipe.imageUrl.split('/private/');
+                if (urlParts.length > 1) {
+                    const imagePath = urlParts[1];
+                    const proxyUrl = `${CONFIG.API.BASE_URL}/images/proxy/${imagePath}`;
+                    console.log(`🖼️ Using DALL-E 3 generated image via proxy for "${recipe.title}": ${proxyUrl}`);
+                    return proxyUrl;
+                }
             }
+            console.log(`🖼️ Using DALL-E 3 generated image for "${recipe.title}": ${recipe.imageUrl}`);
+            return recipe.imageUrl;
         }
 
         // Check for legacy image field
         if (recipe.image && recipe.image !== '') {
             // If it's a DALL-E URL, use our backend proxy
             if (recipe.image.includes('oaidalleapiprodscus.blob.core.windows.net')) {
-                // Extract image ID from DALL-E URL
-                const imageId = recipe.image.split('/').pop();
-                const proxyUrl = `${CONFIG.API.BASE_URL}/images/proxy/${imageId}`;
-                console.log(`🖼️ Using AI-generated image via proxy for "${recipe.title}": ${proxyUrl}`);
-                return proxyUrl;
-            } else {
-                console.log(`🖼️ Using AI-generated image for "${recipe.title}": ${recipe.image}`);
-                return recipe.image;
+                // Extract the full path after /private/ from DALL-E URL
+                const urlParts = recipe.image.split('/private/');
+                if (urlParts.length > 1) {
+                    const imagePath = urlParts[1];
+                    const proxyUrl = `${CONFIG.API.BASE_URL}/images/proxy/${imagePath}`;
+                    console.log(`🖼️ Using AI-generated image via proxy for "${recipe.title}": ${proxyUrl}`);
+                    return proxyUrl;
+                }
             }
+            console.log(`🖼️ Using AI-generated image for "${recipe.title}": ${recipe.image}`);
+            return recipe.image;
         }
 
         // Fallback to placeholder if no image provided

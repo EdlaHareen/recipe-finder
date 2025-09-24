@@ -160,20 +160,22 @@ router.post('/upload', upload.single('image'), async (req, res) => {
 });
 
 // Proxy DALL-E images with proper authentication
-router.get('/proxy/:imageId', async (req, res) => {
+router.get('/proxy/*', async (req, res) => {
     try {
-        const { imageId } = req.params;
+        // Get the full path after /proxy/
+        const imagePath = req.params[0];
         
-        // Validate imageId format (should be like img-xxxxx)
-        if (!imageId || !imageId.startsWith('img-')) {
+        if (!imagePath) {
             return res.status(400).json({
                 success: false,
-                error: 'Invalid image ID format'
+                error: 'No image path provided'
             });
         }
 
-        // Construct the DALL-E image URL
-        const dalleImageUrl = `https://oaidalleapiprodscus.blob.core.windows.net/private/${imageId}`;
+        // Construct the full DALL-E image URL
+        const dalleImageUrl = `https://oaidalleapiprodscus.blob.core.windows.net/private/${imagePath}`;
+        
+        console.log('🖼️ Proxying DALL-E image:', dalleImageUrl);
         
         // Fetch the image with proper headers
         const response = await axios.get(dalleImageUrl, {
