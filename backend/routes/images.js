@@ -3,6 +3,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 const openaiService = require('../services/openaiService');
 
 const router = express.Router();
@@ -158,6 +159,66 @@ router.post('/upload', upload.single('image'), async (req, res) => {
     }
 });
 
+// Proxy DALL-E images with proper authentication
+router.get('/proxy/:imageId', async (req, res) => {
+    try {
+        const { imageId } = req.params;
+        
+        // Validate imageId format (should be like img-xxxxx)
+        if (!imageId || !imageId.startsWith('img-')) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid image ID format'
+            });
+        }
+
+        // Construct the DALL-E image URL
+        const dalleImageUrl = `https://oaidalleapiprodscus.blob.core.windows.net/private/${imageId}`;
+        
+        // Fetch the image with proper headers
+        const response = await axios.get(dalleImageUrl, {
+            responseType: 'stream',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (compatible; RecipeFinder/1.0)',
+                'Accept': 'image/*'
+            },
+            timeout: 10000 // 10 second timeout
+        });
+
+        // Set appropriate headers for the response
+        res.set({
+            'Content-Type': response.headers['content-type'] || 'image/jpeg',
+            'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+            'Content-Length': response.headers['content-length']
+        });
+
+        // Pipe the image data to the response
+        response.data.pipe(res);
+
+    } catch (error) {
+        console.error('Image proxy error:', error);
+        
+        if (error.response?.status === 403) {
+            return res.status(404).json({
+                success: false,
+                error: 'Image not found or access denied'
+            });
+        }
+        
+        if (error.response?.status === 404) {
+            return res.status(404).json({
+                success: false,
+                error: 'Image not found'
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            error: 'Failed to load image'
+        });
+    }
+});
+
 // Get image processing capabilities
 router.get('/capabilities', (req, res) => {
     const maxSize = parseInt(process.env.MAX_IMAGE_SIZE) || 5 * 1024 * 1024;
@@ -174,7 +235,8 @@ router.get('/capabilities', (req, res) => {
                 'ingredient_recognition',
                 'image_optimization',
                 'format_conversion',
-                'resize_and_crop'
+                'resize_and_crop',
+                'dalle_image_proxy'
             ]
         }
     });
