@@ -19,7 +19,10 @@ class MyRecipesPage {
         this.checkAuthStatus();
         
         // Load saved recipes if user is logged in
-        if (window.authManager && window.authManager.isLoggedIn()) {
+        const isLoggedIn = (window.authManager && window.authManager.isLoggedIn()) || 
+                          (localStorage.getItem('recipe_finder_user_data') !== null);
+        
+        if (isLoggedIn) {
             await this.loadSavedRecipes();
         }
     }
@@ -48,7 +51,13 @@ class MyRecipesPage {
             console.log('Token available:', !!window.authManager.getToken());
         }
         
-        if (window.authManager && window.authManager.isLoggedIn()) {
+        // Check if user is logged in OR if we have a valid token in localStorage
+        const isLoggedIn = (window.authManager && window.authManager.isLoggedIn()) || 
+                          (localStorage.getItem('recipe_finder_user_data') !== null);
+        
+        console.log('Final auth check - isLoggedIn:', isLoggedIn);
+        
+        if (isLoggedIn) {
             // User is logged in
             const authButtons = document.getElementById('auth-buttons');
             const userMenu = document.getElementById('user-menu');
@@ -60,11 +69,11 @@ class MyRecipesPage {
             
             console.log('User is authenticated, showing user menu');
         } else {
-            // User is not logged in, redirect to landing page
-            console.log('User not authenticated, redirecting to landing page');
+            // User is not logged in, redirect to pantry page to sign in
+            console.log('User not authenticated, redirecting to pantry page');
             this.showError('Please sign in to view your saved recipes');
             setTimeout(() => {
-                window.location.href = 'index.html';
+                window.location.href = 'pantry.html';
             }, 2000);
         }
     }
