@@ -1169,21 +1169,31 @@ body {
 
 .auth-switch {
     text-align: center;
-    color: #718096;
-    font-size: 1rem;
-    margin-top: 1rem;
+    color: #4a5568;
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    padding: 1rem 0;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    font-weight: 500;
 }
 
 .auth-switch a {
     color: #667eea;
     text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(102, 126, 234, 0.1);
 }
 
 .auth-switch a:hover {
     color: #5a6fd8;
-    text-decoration: underline;
+    background: rgba(102, 126, 234, 0.2);
+    text-decoration: none;
+    transform: translateY(-1px);
 }
 
 .modal-recipe-image {
