@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Pantry - Recipe Finder</title>
-    <meta name="description" content="Add your ingredients and discover amazing AI-generated recipes">
+    <title>My Saved Recipes - Recipe Finder</title>
+    <meta name="description" content="View and manage your saved recipes">
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -19,8 +19,8 @@
                 </div>
                 <div class="header-right">
                     <nav class="nav-menu">
-                        <a href="pantry.html" class="nav-link active">Pantry</a>
-                        <a href="my-recipes.html" class="nav-link">My Recipes</a>
+                        <a href="pantry.html" class="nav-link">Pantry</a>
+                        <a href="my-recipes.html" class="nav-link active">My Recipes</a>
                     </nav>
                     <div class="user-menu" id="user-menu" style="display: none;">
                         <div class="user-info">
@@ -39,46 +39,25 @@
 
     <main class="main">
         <div class="container">
-            <!-- Pantry Section -->
-            <section class="pantry-section">
+            <!-- My Recipes Section -->
+            <section class="my-recipes-section">
                 <div class="section-header">
-                    <h2>Your Pantry</h2>
-                    <p>Add your ingredients and let AI create amazing recipes for you</p>
-                </div>
-
-                <div class="ingredient-section">
-                    <div class="input-group">
-                        <input
-                            type="text"
-                            id="ingredient-input"
-                            placeholder="Add an ingredient (e.g., chicken, tomatoes)"
-                            class="ingredient-input"
-                            autocomplete="off"
-                            maxlength="50"
-                        >
-                        <button id="add-ingredient-btn" class="btn btn-primary">Add</button>
-                    </div>
-
-                    <div class="image-upload-section">
-                        <label for="image-input" class="image-upload-label">
-                            📷 Or upload an image of your ingredients
-                        </label>
-                        <input type="file" id="image-input" accept="image/*" class="image-input">
-                    </div>
-
-                    <div class="ingredients-list" id="ingredients-list">
-                        <!-- Dynamic ingredients will be added here -->
-                    </div>
-
-                    <button id="search-recipes-btn" class="btn btn-success btn-large" disabled>
-                        🔍 Find Recipes
-                    </button>
+                    <h2>My Saved Recipes</h2>
+                    <p>Your personal collection of favorite recipes</p>
                 </div>
 
                 <!-- Loading State -->
                 <div class="loading" id="loading" style="display: none;">
                     <div class="spinner"></div>
-                    <p>Searching for delicious recipes...</p>
+                    <p>Loading your recipes...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state" style="display: none;">
+                    <div class="empty-icon">📚</div>
+                    <h3>No saved recipes yet</h3>
+                    <p>Start exploring recipes and save your favorites!</p>
+                    <a href="pantry.html" class="btn btn-primary">Go to Pantry</a>
                 </div>
 
                 <!-- Error Message -->
@@ -86,13 +65,17 @@
                     <p>Something went wrong. Please try again.</p>
                 </div>
 
-                <!-- Recipe Results Section -->
-                <section class="results-section" id="results-section" style="display: none;">
-                    <h2>Recipe Results</h2>
-                    <div class="recipe-grid" id="recipe-grid">
-                        <!-- Dynamic recipe cards will be added here -->
-                    </div>
-                </section>
+                <!-- Recipes Grid -->
+                <div class="saved-recipes-grid" id="saved-recipes-grid">
+                    <!-- Dynamic saved recipe cards will be added here -->
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="pagination" style="display: none;">
+                    <button class="btn btn-secondary" id="prev-page" disabled>Previous</button>
+                    <span class="page-info" id="page-info">Page 1 of 1</span>
+                    <button class="btn btn-secondary" id="next-page" disabled>Next</button>
+                </div>
             </section>
         </div>
     </main>
@@ -176,6 +159,6 @@
     <script src="assets/js/api.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/savedRecipes.js"></script>
-    <script src="assets/js/app.js"></script>
+    <script src="assets/js/myRecipes.js"></script>
 </body>
 </html>

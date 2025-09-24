@@ -300,6 +300,14 @@ class RecipeFinderApp {
                 ${recipe.cuisineType ? `
                     <div class="cuisine-badge">${recipe.cuisineType}</div>
                 ` : ''}
+
+                <div class="recipe-actions">
+                    <button class="btn btn-primary btn-sm save-recipe-btn" 
+                            onclick="event.stopPropagation(); app.saveRecipe('${this.escapeHtml(recipe.title)}', ${JSON.stringify(recipe).replace(/"/g, '&quot;')})"
+                            title="Save Recipe">
+                        💾 Save
+                    </button>
+                </div>
             </div>
         `;
 
@@ -698,6 +706,59 @@ class RecipeFinderApp {
             console.warn('Failed to load ingredients from localStorage:', error);
             this.ingredients = [];
         }
+    }
+
+    // Save Recipe Method
+    async saveRecipe(recipeTitle, recipeData) {
+        try {
+            // Check if user is logged in
+            if (!window.authManager || !window.authManager.isLoggedIn()) {
+                this.showError('Please sign in to save recipes');
+                return;
+            }
+
+            // Check if recipe is already saved
+            const checkResult = await window.savedRecipesAPI.checkIfSaved(recipeTitle);
+            if (checkResult.data.isSaved) {
+                this.showWarning('Recipe is already saved!');
+                return;
+            }
+
+            // Save the recipe
+            const result = await window.savedRecipesAPI.saveRecipe(recipeData);
+            
+            if (result.success) {
+                this.showSuccess('Recipe saved successfully! 💾');
+                
+                // Update the save button to show it's saved
+                this.updateSaveButton(recipeTitle, true);
+            } else {
+                this.showError(result.error || 'Failed to save recipe');
+            }
+        } catch (error) {
+            console.error('Error saving recipe:', error);
+            this.showError('Failed to save recipe. Please try again.');
+        }
+    }
+
+    // Update save button state
+    updateSaveButton(recipeTitle, isSaved) {
+        const saveButtons = document.querySelectorAll('.save-recipe-btn');
+        saveButtons.forEach(button => {
+            if (button.getAttribute('onclick').includes(recipeTitle)) {
+                if (isSaved) {
+                    button.innerHTML = '✅ Saved';
+                    button.classList.remove('btn-primary');
+                    button.classList.add('btn-success');
+                    button.disabled = true;
+                } else {
+                    button.innerHTML = '💾 Save';
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-primary');
+                    button.disabled = false;
+                }
+            }
+        });
     }
 }
 

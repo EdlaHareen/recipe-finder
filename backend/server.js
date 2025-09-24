@@ -9,6 +9,7 @@ require('dotenv').config();
 const recipeRoutes = require('./routes/recipes');
 const imageRoutes = require('./routes/images');
 const authRoutes = require('./routes/auth');
+const savedRecipeRoutes = require('./routes/savedRecipes');
 const { initializeDatabase } = require('./utils/database');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 
@@ -72,6 +73,7 @@ app.get('/health', (req, res) => {
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/images', imageRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/saved-recipes', savedRecipeRoutes);
 
 // Error handling middleware
 app.use(notFound);
