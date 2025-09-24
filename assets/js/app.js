@@ -303,7 +303,9 @@ class RecipeFinderApp {
 
                 <div class="recipe-actions">
                     <button class="btn btn-primary btn-sm save-recipe-btn" 
-                            onclick="event.stopPropagation(); app.saveRecipe('${this.escapeHtml(recipe.title)}', ${JSON.stringify(recipe).replace(/"/g, '&quot;')})"
+                            data-recipe-title="${this.escapeHtml(recipe.title)}"
+                            data-recipe-data='${JSON.stringify(recipe)}'
+                            onclick="event.stopPropagation(); app.saveRecipeFromButton(this)"
                             title="Save Recipe">
                         💾 Save
                     </button>
@@ -708,6 +710,13 @@ class RecipeFinderApp {
         }
     }
 
+    // Save Recipe Method (called from button)
+    saveRecipeFromButton(button) {
+        const recipeTitle = button.getAttribute('data-recipe-title');
+        const recipeData = JSON.parse(button.getAttribute('data-recipe-data'));
+        this.saveRecipe(recipeTitle, recipeData);
+    }
+
     // Save Recipe Method
     async saveRecipe(recipeTitle, recipeData) {
         try {
@@ -745,7 +754,7 @@ class RecipeFinderApp {
     updateSaveButton(recipeTitle, isSaved) {
         const saveButtons = document.querySelectorAll('.save-recipe-btn');
         saveButtons.forEach(button => {
-            if (button.getAttribute('onclick').includes(recipeTitle)) {
+            if (button.getAttribute('data-recipe-title') === recipeTitle) {
                 if (isSaved) {
                     button.innerHTML = '✅ Saved';
                     button.classList.remove('btn-primary');

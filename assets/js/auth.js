@@ -238,6 +238,14 @@ class AuthManager {
         return this.currentUser !== null && this.token !== null;
     }
 
+    getToken() {
+        return this.token;
+    }
+
+    getUser() {
+        return this.currentUser;
+    }
+
     getAuthHeaders() {
         if (this.token) {
             return {
