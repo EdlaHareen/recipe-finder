@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { supabase } = require('../services/supabaseClient');
+const { getSupabaseClient, isSupabaseConfigured } = require('../services/supabaseClient');
 const jwt = require('jsonwebtoken');
 
 // Middleware to verify JWT token
@@ -29,6 +29,16 @@ router.post('/save', authenticateToken, async (req, res) => {
 
         if (!recipe) {
             return res.status(400).json({ success: false, error: 'Recipe data is required' });
+        }
+
+        // Check if Supabase is configured
+        if (!isSupabaseConfigured()) {
+            return res.status(503).json({ success: false, error: 'Supabase not configured' });
+        }
+
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            return res.status(503).json({ success: false, error: 'Database connection failed' });
         }
 
         // Check if recipe already exists for this user
@@ -96,6 +106,16 @@ router.get('/my-recipes', authenticateToken, async (req, res) => {
 
         const offset = (page - 1) * limit;
 
+        // Check if Supabase is configured
+        if (!isSupabaseConfigured()) {
+            return res.status(503).json({ success: false, error: 'Supabase not configured' });
+        }
+
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            return res.status(503).json({ success: false, error: 'Database connection failed' });
+        }
+
         const { data, error, count } = await supabase
             .from('saved_recipes')
             .select('*', { count: 'exact' })
@@ -139,6 +159,16 @@ router.delete('/:recipeId', authenticateToken, async (req, res) => {
         const { recipeId } = req.params;
         const userId = req.user.userId;
 
+        // Check if Supabase is configured
+        if (!isSupabaseConfigured()) {
+            return res.status(503).json({ success: false, error: 'Supabase not configured' });
+        }
+
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            return res.status(503).json({ success: false, error: 'Database connection failed' });
+        }
+
         const { error } = await supabase
             .from('saved_recipes')
             .delete()
@@ -172,6 +202,16 @@ router.get('/check/:recipeTitle', authenticateToken, async (req, res) => {
     try {
         const { recipeTitle } = req.params;
         const userId = req.user.userId;
+
+        // Check if Supabase is configured
+        if (!isSupabaseConfigured()) {
+            return res.status(503).json({ success: false, error: 'Supabase not configured' });
+        }
+
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            return res.status(503).json({ success: false, error: 'Database connection failed' });
+        }
 
         const { data, error } = await supabase
             .from('saved_recipes')
