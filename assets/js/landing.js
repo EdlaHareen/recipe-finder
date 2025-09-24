@@ -278,12 +278,7 @@ class LandingPage {
             if (authButtons) authButtons.style.display = 'none';
             if (userMenu) userMenu.style.display = 'flex';
             
-            // If user is on landing page and logged in, redirect to pantry
-            if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
-                setTimeout(() => {
-                    window.location.href = 'pantry.html';
-                }, 2000); // Give user time to see they're logged in
-            }
+            // Don't automatically redirect - let users stay on landing page if they want
         }
     }
 
