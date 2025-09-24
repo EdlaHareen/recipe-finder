@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Finder - Find Recipes with Your Ingredients</title>
+    <meta name="description" content="Find delicious recipes using ingredients you already have at home">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">🍳 Recipe Finder</h1>
+            <p class="tagline">Discover recipes with ingredients you have</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Ingredient Input Section -->
+            <section class="ingredient-section">
+                <h2>Your Pantry</h2>
+
+                <div class="input-group">
+                    <input
+                        type="text"
+                        id="ingredient-input"
+                        placeholder="Add an ingredient (e.g., chicken, tomatoes)"
+                        class="ingredient-input"
+                        autocomplete="off"
+                        maxlength="50"
+                    >
+                    <button id="add-ingredient-btn" class="btn btn-primary">Add</button>
+                </div>
+
+                <div class="image-upload-section">
+                    <label for="image-input" class="image-upload-label">
+                        📷 Or upload an image of your ingredient
+                    </label>
+                    <input type="file" id="image-input" accept="image/*" class="image-input">
+                </div>
+
+                <div class="ingredients-list" id="ingredients-list">
+                    <!-- Dynamic ingredients will be added here -->
+                </div>
+
+                <button id="search-recipes-btn" class="btn btn-success" disabled>
+                    🔍 Find Recipes
+                </button>
+            </section>
+
+            <!-- Loading State -->
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Searching for delicious recipes...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="error-message" style="display: none;">
+                <p>Something went wrong. Please try again.</p>
+            </div>
+
+            <!-- Recipe Results Section -->
+            <section class="results-section" id="results-section" style="display: none;">
+                <h2>Recipe Results</h2>
+                <div class="recipe-grid" id="recipe-grid">
+                    <!-- Dynamic recipe cards will be added here -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Recipe Detail Modal -->
+    <div class="modal" id="recipe-modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" id="modal-close">&times;</span>
+            <div class="modal-body" id="modal-body">
+                <!-- Recipe details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Recipe Finder. Powered by Spoonacular API.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
