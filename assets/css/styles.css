@@ -1071,16 +1071,74 @@ body {
 /* Authentication Modal Styles */
 .auth-modal-content {
     max-width: 450px;
+    max-height: 90vh;
     margin: 5% auto;
     background: white;
     border-radius: 16px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .auth-container {
     padding: 2.5rem 2rem;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    overflow-y: auto;
+    flex: 1;
+    max-height: calc(90vh - 60px); /* Account for close button space */
+}
+
+/* Custom scrollbar for auth container */
+.auth-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.auth-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+.auth-container::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.5);
+    border-radius: 3px;
+}
+
+.auth-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.7);
+}
+
+/* Responsive adjustments for auth modal */
+@media (max-width: 768px) {
+    .auth-modal-content {
+        max-width: 95vw;
+        max-height: 95vh;
+        margin: 2.5% auto;
+    }
+    
+    .auth-container {
+        padding: 1.5rem 1rem;
+        max-height: calc(95vh - 60px);
+    }
+    
+    .auth-form h2 {
+        font-size: 1.5rem;
+    }
+    
+    .auth-subtitle {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-group input {
+        padding: 14px 16px;
+        font-size: 1rem;
+    }
+    
+    .auth-btn {
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
 }
 
 .auth-form h2 {
