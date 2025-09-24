@@ -9,11 +9,28 @@ class SavedRecipesAPI {
         };
 
         // Add authentication header if user is logged in
+        let token = null;
+        
+        // Try to get token from auth manager first
         if (window.authManager && window.authManager.isLoggedIn()) {
-            const token = window.authManager.getToken();
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
+            token = window.authManager.getToken();
+        }
+        
+        // Fallback: check localStorage directly
+        if (!token) {
+            const userData = localStorage.getItem('recipe_finder_user_data');
+            if (userData) {
+                try {
+                    const parsed = JSON.parse(userData);
+                    token = parsed.token;
+                } catch (e) {
+                    console.warn('Failed to parse user data from localStorage');
+                }
             }
+        }
+        
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
         }
 
         return headers;

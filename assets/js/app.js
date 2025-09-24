@@ -8,8 +8,10 @@ class RecipeFinderApp {
 
     initializeApp() {
         this.loadIngredientsFromStorage();
+        this.loadRecipesFromStorage();
         this.bindEvents();
         this.updateUI();
+        this.displayRecipes(this.currentRecipes);
         console.log('🍳 Recipe Finder App initialized');
     }
 
@@ -206,6 +208,7 @@ class RecipeFinderApp {
 
             if (result.success) {
                 this.currentRecipes = result.data;
+                this.saveRecipesToStorage(result.data);
                 this.displayRecipes(result.data);
 
                 if (result.data.length === 0) {
@@ -708,6 +711,30 @@ class RecipeFinderApp {
             console.warn('Failed to load ingredients from localStorage:', error);
             this.ingredients = [];
         }
+    }
+
+    saveRecipesToStorage(recipes) {
+        try {
+            localStorage.setItem(CONFIG.STORAGE.RECIPES, JSON.stringify(recipes));
+            console.log('💾 Saved recipes to storage:', recipes.length, 'recipes');
+        } catch (error) {
+            console.warn('Failed to save recipes to localStorage:', error);
+        }
+    }
+
+    loadRecipesFromStorage() {
+        try {
+            const saved = localStorage.getItem(CONFIG.STORAGE.RECIPES);
+            if (saved) {
+                this.currentRecipes = JSON.parse(saved);
+                console.log('📦 Loaded recipes from storage:', this.currentRecipes.length, 'recipes');
+                return this.currentRecipes;
+            }
+        } catch (error) {
+            console.warn('Failed to load recipes from localStorage:', error);
+            this.currentRecipes = [];
+        }
+        return [];
     }
 
     // Save Recipe Method (called from button)

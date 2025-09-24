@@ -20,6 +20,7 @@ const CONFIG = {
     // Local Storage Keys
     STORAGE: {
         INGREDIENTS: 'recipe_finder_ingredients',
+        RECIPES: 'recipe_finder_recipes',
         SESSION_ID: 'recipe_finder_session_id',
         PREFERENCES: 'recipe_finder_preferences',
         USER_DATA: 'recipe_finder_user_data'
