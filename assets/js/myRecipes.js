@@ -9,11 +9,14 @@ class MyRecipesPage {
     }
 
     async init() {
+        // Set up event listeners first
+        this.setupEventListeners();
+        
+        // Wait for auth manager to be available
+        await this.waitForAuthManager();
+        
         // Check authentication status
         this.checkAuthStatus();
-        
-        // Set up event listeners
-        this.setupEventListeners();
         
         // Load saved recipes if user is logged in
         if (window.authManager && window.authManager.isLoggedIn()) {
@@ -21,7 +24,30 @@ class MyRecipesPage {
         }
     }
 
+    async waitForAuthManager() {
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max wait
+        
+        while (!window.authManager && attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+        
+        if (!window.authManager) {
+            console.warn('Auth manager not available after waiting');
+        }
+    }
+
     checkAuthStatus() {
+        console.log('Checking auth status...');
+        console.log('Auth manager available:', !!window.authManager);
+        
+        if (window.authManager) {
+            console.log('User logged in:', window.authManager.isLoggedIn());
+            console.log('Current user:', window.authManager.getUser());
+            console.log('Token available:', !!window.authManager.getToken());
+        }
+        
         if (window.authManager && window.authManager.isLoggedIn()) {
             // User is logged in
             const authButtons = document.getElementById('auth-buttons');
@@ -31,8 +57,11 @@ class MyRecipesPage {
             if (authButtons) authButtons.style.display = 'none';
             if (userMenu) userMenu.style.display = 'flex';
             if (userName) userName.textContent = window.authManager.getUser().full_name || window.authManager.getUser().email;
+            
+            console.log('User is authenticated, showing user menu');
         } else {
             // User is not logged in, redirect to landing page
+            console.log('User not authenticated, redirecting to landing page');
             this.showError('Please sign in to view your saved recipes');
             setTimeout(() => {
                 window.location.href = 'index.html';
