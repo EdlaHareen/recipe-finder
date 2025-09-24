@@ -135,10 +135,34 @@ body {
 }
 
 .gradient-text {
-    background: linear-gradient(45deg, #ffd700, #ff6b6b);
+    /* Fallback for browsers that don't support gradient text */
+    color: #ff6b6b;
+    font-weight: 700;
+    display: inline-block;
+    
+    /* Gradient text for supporting browsers */
+    background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #45b7d1);
+    background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: gradient-shift 3s ease-in-out infinite;
+}
+
+/* Ensure gradient text works in WebKit browsers */
+@supports (-webkit-background-clip: text) {
+    .gradient-text {
+        color: transparent;
+    }
+}
+
+@keyframes gradient-shift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
 }
 
 .hero-subtitle {
