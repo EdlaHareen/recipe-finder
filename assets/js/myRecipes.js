@@ -115,6 +115,23 @@ class MyRecipesPage {
             this.hideError();
             this.hideEmptyState();
 
+            console.log('🔍 Loading saved recipes...');
+            console.log('Current page:', this.currentPage);
+            console.log('Recipes per page:', this.recipesPerPage);
+            
+            // Check authentication status
+            const userData = localStorage.getItem('recipe_finder_user_data');
+            console.log('User data in localStorage:', userData ? 'Present' : 'Not found');
+            
+            if (userData) {
+                try {
+                    const parsed = JSON.parse(userData);
+                    console.log('User token available:', !!parsed.token);
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                }
+            }
+
             const result = await window.savedRecipesAPI.getMyRecipes(this.currentPage, this.recipesPerPage);
             
             if (result.success) {
@@ -132,7 +149,16 @@ class MyRecipesPage {
             }
         } catch (error) {
             console.error('Error loading saved recipes:', error);
-            this.showError('Failed to load saved recipes. Please try again.');
+            console.error('Error details:', error.message);
+            
+            // Show more specific error message
+            if (error.message.includes('Access token required') || error.message.includes('401')) {
+                this.showError('Please log in to view your saved recipes.');
+            } else if (error.message.includes('403')) {
+                this.showError('Access denied. Please log in again.');
+            } else {
+                this.showError('Failed to load saved recipes. Please try again.');
+            }
         } finally {
             this.hideLoading();
         }
