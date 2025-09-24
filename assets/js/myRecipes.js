@@ -110,6 +110,19 @@ class MyRecipesPage {
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => window.authManager.logout());
         }
+
+        // Event delegation for delete buttons (since they're dynamically created)
+        const savedRecipesGrid = document.getElementById('saved-recipes-grid');
+        if (savedRecipesGrid) {
+            savedRecipesGrid.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-recipe-btn')) {
+                    const recipeId = e.target.getAttribute('data-recipe-id');
+                    const recipeTitle = e.target.getAttribute('data-recipe-title');
+                    console.log('🗑️ Delete button clicked via event delegation:', { recipeId, recipeTitle });
+                    this.deleteRecipe(recipeId, recipeTitle);
+                }
+            });
+        }
     }
 
     async loadSavedRecipes() {
@@ -231,8 +244,9 @@ class MyRecipesPage {
                             title="View Recipe">
                         👁️ View
                     </button>
-                    <button class="btn btn-danger btn-sm" 
-                            onclick="myRecipesPage.deleteRecipe(${savedRecipe.id}, '${this.escapeHtml(recipe.title)}')"
+                    <button class="btn btn-danger btn-sm delete-recipe-btn" 
+                            data-recipe-id="${savedRecipe.id}"
+                            data-recipe-title="${this.escapeHtml(recipe.title)}"
                             title="Delete Recipe">
                         🗑️ Delete
                     </button>
@@ -319,6 +333,13 @@ class MyRecipesPage {
 
     async deleteRecipe(recipeId, recipeTitle) {
         console.log('🗑️ Delete recipe called:', { recipeId, recipeTitle });
+        
+        // Validate inputs
+        if (!recipeId || !recipeTitle) {
+            console.error('❌ Invalid recipe ID or title:', { recipeId, recipeTitle });
+            this.showError('Invalid recipe data. Cannot delete.');
+            return;
+        }
         
         if (!confirm(`Are you sure you want to delete "${recipeTitle}"?`)) {
             return;
