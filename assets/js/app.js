@@ -14,9 +14,6 @@ class RecipeFinderApp {
         this.displayRecipes(this.currentRecipes);
         this.initializeLazyLoading();
         
-        // Clear old recipes with DALL-E URLs to force regeneration with new system
-        this.clearOldDalleRecipes();
-        
         console.log('🍳 Recipe Finder App initialized');
     }
 
@@ -553,7 +550,9 @@ class RecipeFinderApp {
         if (recipe.image && recipe.image !== '') {
             // If it's a local upload URL, use it directly
             if (recipe.image.startsWith('/uploads/')) {
-                const localUrl = `${CONFIG.API.BASE_URL}${recipe.image}`;
+                // Use the base server URL without /api for static files
+                const baseUrl = CONFIG.API.BASE_URL.replace('/api', '');
+                const localUrl = `${baseUrl}${recipe.image}`;
                 console.log(`🖼️ Using local stored image for "${recipe.title}": ${localUrl}`);
                 return localUrl;
             }
