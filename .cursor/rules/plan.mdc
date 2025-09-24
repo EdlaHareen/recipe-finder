@@ -1,0 +1,242 @@
+---
+description: Planning and task management rules for Recipe Finder
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Recipe Finder - Planning & Task Management Rules
+
+## Planning Principles
+
+### 1. Agile Development Approach
+- Break down features into small, manageable tasks
+- Prioritize tasks based on user value and technical dependencies
+- Use iterative development with regular feedback
+- Maintain a clear backlog of tasks and issues
+
+### 2. Task Prioritization
+- **High Priority**: Critical bugs, security issues, core functionality
+- **Medium Priority**: Performance improvements, enhanced features
+- **Low Priority**: Nice-to-have features, optimizations
+
+### 3. User-Centric Planning
+- Always consider user experience in planning decisions
+- Prioritize features that directly impact user satisfaction
+- Plan for accessibility and mobile-first design
+- Consider performance impact on user experience
+
+## Task Management Guidelines
+
+### Task Definition
+- Each task should be specific and actionable
+- Include clear acceptance criteria
+- Estimate effort and complexity
+- Identify dependencies and blockers
+
+### Task Categories
+1. **Bug Fixes**: Issues that need immediate attention
+2. **Feature Development**: New functionality implementation
+3. **Performance Optimization**: Speed and efficiency improvements
+4. **Security Enhancements**: Security-related improvements
+5. **UI/UX Improvements**: User interface and experience enhancements
+6. **Documentation**: Code and project documentation
+7. **Testing**: Test implementation and quality assurance
+
+### Current Sprint Focus
+- Authentication system stability
+- Recipe persistence and management
+- Error handling improvements
+- Mobile responsiveness optimization
+
+## Planning Workflow
+
+### 1. Requirements Analysis
+- Understand user needs and business requirements
+- Identify technical constraints and dependencies
+- Assess impact on existing functionality
+- Consider performance and security implications
+
+### 2. Task Breakdown
+- Break large features into smaller, testable units
+- Identify technical dependencies
+- Estimate effort and complexity
+- Assign priorities and deadlines
+
+### 3. Implementation Planning
+- Plan development sequence
+- Identify testing requirements
+- Plan for code review and quality assurance
+- Consider deployment and rollback strategies
+
+### 4. Progress Tracking
+- Regular status updates
+- Identify blockers and dependencies
+- Adjust priorities based on feedback
+- Document lessons learned
+
+## Current Project Status
+
+### Completed Features
+- ✅ User authentication with Supabase
+- ✅ Recipe generation with OpenAI
+- ✅ Recipe caching system
+- ✅ Recipe saving functionality
+- ✅ My Recipes page
+- ✅ Landing page design
+
+### In Progress
+- 🔄 Authentication timing fixes
+- 🔄 Recipe persistence improvements
+- 🔄 Error handling enhancements
+- 🔄 Mobile responsiveness
+
+### Planned Features
+- 📋 Recipe search functionality
+- 📋 Recipe rating system
+- 📋 Image lazy loading
+- 📋 Offline mode
+- 📋 Performance optimizations
+
+## Task Planning Templates
+
+### Feature Development Task
+```
+Task: [Feature Name]
+Priority: [High/Medium/Low]
+Effort: [Story Points]
+Dependencies: [List dependencies]
+Acceptance Criteria:
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+Testing Requirements:
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Manual testing
+```
+
+### Bug Fix Task
+```
+Bug: [Bug Description]
+Priority: [Critical/High/Medium/Low]
+Impact: [User Impact Description]
+Root Cause: [Analysis of cause]
+Solution: [Proposed solution]
+Testing: [Testing approach]
+```
+
+### Performance Task
+```
+Task: [Performance Improvement]
+Priority: [High/Medium/Low]
+Current State: [Baseline metrics]
+Target State: [Desired metrics]
+Approach: [Implementation strategy]
+Measurement: [How to measure success]
+```
+
+## Planning Best Practices
+
+### 1. User Story Format
+- As a [user type], I want [functionality] so that [benefit]
+- Include acceptance criteria
+- Consider edge cases and error scenarios
+- Plan for testing and validation
+
+### 2. Technical Planning
+- Consider architecture and design patterns
+- Plan for scalability and maintainability
+- Identify potential risks and mitigation strategies
+- Plan for code review and quality assurance
+
+### 3. Risk Management
+- Identify potential risks early
+- Plan mitigation strategies
+- Consider fallback options
+- Monitor and adjust plans based on feedback
+
+### 4. Communication
+- Keep stakeholders informed of progress
+- Document decisions and rationale
+- Share knowledge and lessons learned
+- Maintain clear communication channels
+
+## Sprint Planning Guidelines
+
+### Sprint Goals
+- Define clear, measurable goals
+- Focus on user value delivery
+- Balance new features with technical debt
+- Plan for testing and quality assurance
+
+### Sprint Capacity
+- Consider team availability and capacity
+- Account for meetings and overhead
+- Plan for unexpected issues and bugs
+- Include buffer time for complex tasks
+
+### Sprint Review
+- Review completed work
+- Gather feedback from stakeholders
+- Identify lessons learned
+- Plan improvements for next sprint
+
+## Quality Assurance Planning
+
+### Testing Strategy
+- Plan for unit, integration, and end-to-end testing
+- Include manual testing for user experience
+- Plan for performance and security testing
+- Consider automated testing where appropriate
+
+### Code Review Process
+- Plan for peer review of all changes
+- Define review criteria and standards
+- Plan for knowledge sharing and mentoring
+- Include security and performance reviews
+
+### Documentation Planning
+- Plan for code documentation
+- Include user documentation where needed
+- Plan for architecture and design documentation
+- Consider maintenance and troubleshooting guides
+
+## Monitoring and Metrics
+
+### Development Metrics
+- Track task completion rates
+- Monitor code quality metrics
+- Track bug discovery and resolution rates
+- Monitor performance improvements
+
+### User Experience Metrics
+- Track user engagement and satisfaction
+- Monitor performance metrics
+- Track error rates and user feedback
+- Monitor feature adoption rates
+
+### Business Metrics
+- Track development velocity
+- Monitor project costs and ROI
+- Track time to market for features
+- Monitor user growth and retention
+
+## Continuous Improvement
+
+### Retrospectives
+- Regular retrospectives to identify improvements
+- Focus on process and tool improvements
+- Share knowledge and best practices
+- Plan for team development and growth
+
+### Process Optimization
+- Continuously improve development processes
+- Optimize tools and workflows
+- Improve communication and collaboration
+- Enhance quality assurance processes
+
+### Learning and Development
+- Plan for skill development and training
+- Share knowledge and best practices
+- Learn from mistakes and successes
+- Stay updated with technology trends

@@ -1,0 +1,588 @@
+---
+description: Debugging and troubleshooting guidelines for Recipe Finder
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Recipe Finder - Debugging & Troubleshooting Guidelines
+
+## Debugging Principles
+
+### 1. Systematic Approach
+- Start with the most likely causes
+- Use logging and debugging tools effectively
+- Test hypotheses systematically
+- Document findings and solutions
+
+### 2. User-Centric Debugging
+- Reproduce issues from user perspective
+- Test across different browsers and devices
+- Consider network conditions and performance
+- Validate user experience impact
+
+### 3. Performance Debugging
+- Monitor API response times
+- Check database query performance
+- Analyze frontend loading times
+- Identify bottlenecks and optimization opportunities
+
+## Common Issues & Solutions
+
+### Authentication Issues
+
+#### Problem: "Please sign in" message appears for logged-in users
+**Symptoms:**
+- User is logged in but sees authentication error
+- My Recipes page shows "Please sign in" message
+- 403 Forbidden errors in API calls
+
+**Debugging Steps:**
+1. Check browser console for authentication errors
+2. Verify JWT token in localStorage
+3. Check token expiration
+4. Validate auth manager initialization
+
+**Solutions:**
+```javascript
+// Add localStorage fallback for authentication
+const buildHeaders = async () => {
+  const headers = { 'Content-Type': 'application/json' };
+  
+  let token = null;
+  
+  // Try auth manager first
+  if (window.authManager && window.authManager.isLoggedIn()) {
+    token = window.authManager.getToken();
+  }
+  
+  // Fallback to localStorage
+  if (!token) {
+    const userData = localStorage.getItem('recipe_finder_user_data');
+    if (userData) {
+      try {
+        const parsed = JSON.parse(userData);
+        token = parsed.token;
+      } catch (e) {
+        console.warn('Failed to parse user data');
+      }
+    }
+  }
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return headers;
+};
+```
+
+#### Problem: JWT token validation fails
+**Symptoms:**
+- 401 Unauthorized errors
+- Token appears valid but server rejects it
+- Authentication works in development but fails in production
+
+**Debugging Steps:**
+1. Check JWT secret configuration
+2. Verify token format and expiration
+3. Check server-side token validation
+4. Validate CORS settings
+
+**Solutions:**
+```javascript
+// Enhanced token validation
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    return res.status(403).json({ error: 'Invalid or expired token' });
+  }
+};
+```
+
+### Recipe Generation Issues
+
+#### Problem: OpenAI API errors
+**Symptoms:**
+- Recipe generation fails with API errors
+- "Cooking time must be between 5 and 480 minutes" error
+- Slow response times or timeouts
+
+**Debugging Steps:**
+1. Check OpenAI API key configuration
+2. Verify API rate limits and quotas
+3. Check request payload format
+4. Monitor API response times
+
+**Solutions:**
+```javascript
+// Enhanced error handling for OpenAI API
+const generateRecipe = async (ingredients, options = {}) => {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are a professional chef. Generate recipes based on available ingredients.
+                   Ensure cooking times are realistic (5-480 minutes).
+                   Return valid JSON format.`
+        },
+        {
+          role: "user",
+          content: `Create recipes using these ingredients: ${ingredients.join(', ')}`
+        }
+      ],
+      max_tokens: 2000,
+      temperature: 0.7
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error('OpenAI API error:', error);
+    
+    if (error.code === 'rate_limit_exceeded') {
+      throw new Error('API rate limit exceeded. Please try again later.');
+    } else if (error.code === 'insufficient_quota') {
+      throw new Error('API quota exceeded. Please check your OpenAI account.');
+    } else {
+      throw new Error('Recipe generation failed. Please try again.');
+    }
+  }
+};
+```
+
+#### Problem: Recipe caching issues
+**Symptoms:**
+- Same ingredients generate different recipes
+- Cache hit rate is low
+- Database errors when caching recipes
+
+**Debugging Steps:**
+1. Check cache key generation
+2. Verify database connection
+3. Check cache expiration logic
+4. Monitor cache hit/miss rates
+
+**Solutions:**
+```javascript
+// Improved cache key generation
+const generateCacheKey = (ingredients) => {
+  // Normalize ingredients (lowercase, trim, sort)
+  const normalized = ingredients
+    .map(ingredient => ingredient.toLowerCase().trim())
+    .filter(ingredient => ingredient.length > 0)
+    .sort();
+  
+  return crypto
+    .createHash('md5')
+    .update(normalized.join(','))
+    .digest('hex');
+};
+
+// Enhanced cache retrieval
+const getCachedRecipe = async (ingredients) => {
+  try {
+    const cacheKey = generateCacheKey(ingredients);
+    
+    const { data, error } = await supabase
+      .from('recipe_cache')
+      .select('*')
+      .eq('ingredients_hash', cacheKey)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+      throw error;
+    }
+
+    if (data) {
+      // Update access count
+      await supabase
+        .from('recipe_cache')
+        .update({
+          access_count: data.access_count + 1,
+          last_accessed: new Date().toISOString()
+        })
+        .eq('id', data.id);
+      
+      return data.recipe_data;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Cache retrieval error:', error);
+    return null;
+  }
+};
+```
+
+### Database Issues
+
+#### Problem: Supabase connection errors
+**Symptoms:**
+- Database queries fail
+- "Could not find the table" errors
+- RLS policy violations
+
+**Debugging Steps:**
+1. Check Supabase URL and API key
+2. Verify table existence and schema
+3. Check RLS policies
+4. Validate database permissions
+
+**Solutions:**
+```javascript
+// Enhanced Supabase client with error handling
+const getSupabaseClient = () => {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+    throw new Error('Supabase configuration missing');
+  }
+
+  const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY
+  );
+
+  // Test connection
+  supabase.from('users').select('count').limit(1)
+    .then(() => console.log('✅ Supabase connection successful'))
+    .catch(error => console.error('❌ Supabase connection failed:', error));
+
+  return supabase;
+};
+
+// RLS policy fix
+const fixRLSPolicies = async () => {
+  try {
+    // Disable RLS temporarily for debugging
+    await supabase.rpc('exec_sql', {
+      sql: 'ALTER TABLE saved_recipes DISABLE ROW LEVEL SECURITY;'
+    });
+    
+    console.log('RLS disabled for debugging');
+  } catch (error) {
+    console.error('Failed to disable RLS:', error);
+  }
+};
+```
+
+### Frontend Issues
+
+#### Problem: JavaScript errors in browser
+**Symptoms:**
+- Console errors and warnings
+- Features not working as expected
+- Page crashes or freezes
+
+**Debugging Steps:**
+1. Check browser console for errors
+2. Verify JavaScript file loading
+3. Check for syntax errors
+4. Validate API responses
+
+**Solutions:**
+```javascript
+// Global error handler
+window.addEventListener('error', (event) => {
+  console.error('Global error:', {
+    message: event.message,
+    filename: event.filename,
+    lineno: event.lineno,
+    colno: event.colno,
+    error: event.error
+  });
+  
+  // Send error to logging service
+  logError({
+    type: 'javascript_error',
+    message: event.message,
+    stack: event.error?.stack,
+    url: window.location.href,
+    userAgent: navigator.userAgent
+  });
+});
+
+// API error handling
+const handleApiError = (error, context) => {
+  console.error(`API Error in ${context}:`, error);
+  
+  // Log error details
+  logError({
+    type: 'api_error',
+    context,
+    status: error.status,
+    message: error.message,
+    url: error.url
+  });
+  
+  // Show user-friendly message
+  showError(getUserFriendlyMessage(error));
+};
+```
+
+#### Problem: Performance issues
+**Symptoms:**
+- Slow page loading
+- Unresponsive UI
+- High memory usage
+
+**Debugging Steps:**
+1. Use browser dev tools performance tab
+2. Check network requests
+3. Analyze JavaScript execution
+4. Monitor memory usage
+
+**Solutions:**
+```javascript
+// Performance monitoring
+const performanceMonitor = {
+  startTime: null,
+  
+  start(label) {
+    this.startTime = performance.now();
+    console.log(`⏱️ Starting: ${label}`);
+  },
+  
+  end(label) {
+    if (this.startTime) {
+      const duration = performance.now() - this.startTime;
+      console.log(`⏱️ Completed: ${label} (${duration.toFixed(2)}ms)`);
+      
+      // Log slow operations
+      if (duration > 1000) {
+        console.warn(`⚠️ Slow operation: ${label} took ${duration.toFixed(2)}ms`);
+      }
+    }
+  }
+};
+
+// Lazy loading implementation
+const lazyLoadImages = () => {
+  const images = document.querySelectorAll('img[data-src]');
+  
+  if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src;
+          img.removeAttribute('data-src');
+          imageObserver.unobserve(img);
+        }
+      });
+    });
+    
+    images.forEach(img => imageObserver.observe(img));
+  } else {
+    // Fallback for older browsers
+    images.forEach(img => {
+      img.src = img.dataset.src;
+      img.removeAttribute('data-src');
+    });
+  }
+};
+```
+
+## Debugging Tools & Techniques
+
+### Browser Dev Tools
+```javascript
+// Console debugging
+console.log('Debug info:', { user, token, recipes });
+console.table(recipes); // Display data in table format
+console.group('Recipe Generation'); // Group related logs
+console.time('API Call'); // Measure execution time
+// ... API call
+console.timeEnd('API Call');
+
+// Breakpoint debugging
+debugger; // Pause execution for inspection
+
+// Network debugging
+fetch('/api/recipes/generate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ ingredients: ['chicken', 'rice'] })
+})
+.then(response => {
+  console.log('Response status:', response.status);
+  console.log('Response headers:', response.headers);
+  return response.json();
+})
+.then(data => console.log('Response data:', data))
+.catch(error => console.error('Request failed:', error));
+```
+
+### Server-Side Debugging
+```javascript
+// Request logging middleware
+const requestLogger = (req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  console.log('Headers:', req.headers);
+  console.log('Body:', req.body);
+  next();
+};
+
+// Error logging
+const logError = (error, context = {}) => {
+  console.error('Error occurred:', {
+    timestamp: new Date().toISOString(),
+    error: error.message,
+    stack: error.stack,
+    context
+  });
+  
+  // Send to external logging service if configured
+  if (process.env.LOGGING_SERVICE) {
+    sendToLoggingService({
+      level: 'error',
+      message: error.message,
+      stack: error.stack,
+      context
+    });
+  }
+};
+```
+
+### Database Debugging
+```javascript
+// Query logging
+const logQuery = (query, params) => {
+  console.log('Database Query:', query);
+  console.log('Parameters:', params);
+};
+
+// Connection testing
+const testDatabaseConnection = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('count')
+      .limit(1);
+    
+    if (error) {
+      console.error('Database connection failed:', error);
+      return false;
+    }
+    
+    console.log('✅ Database connection successful');
+    return true;
+  } catch (error) {
+    console.error('Database connection error:', error);
+    return false;
+  }
+};
+```
+
+## Common Error Messages & Solutions
+
+### "Access token required"
+- **Cause:** Missing or invalid JWT token
+- **Solution:** Check authentication state and token validity
+
+### "Could not find the table"
+- **Cause:** Database table doesn't exist or RLS policies
+- **Solution:** Verify table creation and RLS configuration
+
+### "new row violates row-level security policy"
+- **Cause:** RLS policies blocking data insertion
+- **Solution:** Check RLS policies or temporarily disable for debugging
+
+### "API rate limit exceeded"
+- **Cause:** Too many requests to OpenAI API
+- **Solution:** Implement rate limiting and caching
+
+### "Failed to save recipe"
+- **Cause:** Database error or validation failure
+- **Solution:** Check database connection and data validation
+
+## Debugging Checklist
+
+### Before Starting Debugging
+- [ ] Reproduce the issue consistently
+- [ ] Check browser console for errors
+- [ ] Verify network requests in dev tools
+- [ ] Check server logs for errors
+- [ ] Validate input data and parameters
+
+### During Debugging
+- [ ] Add logging statements at key points
+- [ ] Use breakpoints to inspect variables
+- [ ] Test with different inputs and scenarios
+- [ ] Check database state and queries
+- [ ] Monitor API responses and errors
+
+### After Fixing
+- [ ] Test the fix thoroughly
+- [ ] Verify no regression in other features
+- [ ] Update documentation if needed
+- [ ] Add tests to prevent future occurrences
+- [ ] Document the solution for future reference
+
+## Performance Debugging
+
+### Frontend Performance
+```javascript
+// Measure page load time
+window.addEventListener('load', () => {
+  const loadTime = performance.now();
+  console.log(`Page loaded in ${loadTime.toFixed(2)}ms`);
+});
+
+// Measure API call performance
+const measureApiCall = async (apiCall, label) => {
+  const start = performance.now();
+  try {
+    const result = await apiCall();
+    const duration = performance.now() - start;
+    console.log(`${label} completed in ${duration.toFixed(2)}ms`);
+    return result;
+  } catch (error) {
+    const duration = performance.now() - start;
+    console.error(`${label} failed after ${duration.toFixed(2)}ms:`, error);
+    throw error;
+  }
+};
+```
+
+### Backend Performance
+```javascript
+// Request timing middleware
+const requestTiming = (req, res, next) => {
+  const start = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`);
+    
+    if (duration > 1000) {
+      console.warn(`Slow request: ${req.method} ${req.path} took ${duration}ms`);
+    }
+  });
+  
+  next();
+};
+```
+
+## Best Practices for Debugging
+
+1. **Use systematic approach** - Start with most likely causes
+2. **Add comprehensive logging** - Log key operations and errors
+3. **Test with different scenarios** - Edge cases and error conditions
+4. **Document solutions** - Keep record of fixes for future reference
+5. **Monitor performance** - Track metrics and identify bottlenecks
+6. **Use debugging tools** - Browser dev tools, logging services
+7. **Validate assumptions** - Don't assume, verify with data
+8. **Test thoroughly** - Ensure fixes don't break other functionality
+9. **Keep debugging code** - Comment out rather than delete
+10. **Learn from issues** - Improve processes to prevent similar problems

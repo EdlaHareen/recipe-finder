@@ -1,0 +1,319 @@
+---
+description: Directory structure and organization guidelines for Recipe Finder
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Recipe Finder - Directory Structure & Organization
+
+## Project Structure Overview
+
+```
+recipe-finder/
+├── docs/                           # 📚 Project Documentation
+│   ├── product_requirement_docs.md # Product requirements and specifications
+│   ├── architecture.md             # System architecture and design
+│   └── technical.md                # Technical specifications and implementation
+├── tasks/                          # 📋 Task Management & Planning
+│   ├── tasks_plan.md               # Task backlog and project progress
+│   └── active_context.md           # Current development context and focus
+├── .cursor/                        # 🤖 Cursor IDE Rules & Configuration
+│   └── rules/
+│       ├── rules.mdc               # Core development rules
+│       ├── plan.mdc                # Planning and task management rules
+│       ├── implement.mdc           # Implementation guidelines
+│       ├── debug.mdc               # Debugging and troubleshooting
+│       ├── memory.mdc              # Memory and knowledge management
+│       └── directory-structure.mdc # This file
+├── backend/                        # 🖥️ Backend Application
+│   ├── server.js                   # Main server entry point
+│   ├── package.json                # Backend dependencies
+│   ├── .env                        # Environment variables (not in git)
+│   ├── routes/                     # API route handlers
+│   │   ├── auth.js                 # Authentication routes
+│   │   ├── recipes.js              # Recipe generation routes
+│   │   ├── savedRecipes.js         # Saved recipes management
+│   │   └── images.js               # Image analysis routes
+│   ├── services/                   # Business logic services
+│   │   ├── openaiService.js        # OpenAI API integration
+│   │   └── supabaseClient.js       # Supabase database client
+│   ├── middleware/                 # Express middleware
+│   │   └── errorMiddleware.js      # Error handling middleware
+│   ├── utils/                      # Utility functions
+│   │   └── database.js             # Database utilities
+│   └── .cursor/                    # Backend-specific Cursor rules
+│       └── rules/
+├── assets/                         # 🎨 Frontend Assets
+│   ├── css/
+│   │   └── styles.css              # Main stylesheet
+│   └── js/
+│       ├── app.js                  # Main application logic
+│       ├── api.js                  # API communication layer
+│       ├── auth.js                 # Authentication management
+│       ├── config.js               # Configuration constants
+│       ├── landing.js              # Landing page functionality
+│       ├── myRecipes.js            # My Recipes page logic
+│       └── savedRecipes.js         # Saved recipes API client
+├── index.html                      # 🏠 Landing page
+├── pantry.html                     # 🍳 Main recipe finder interface
+├── my-recipes.html                 # 📚 User's saved recipes page
+├── README.md                       # 📖 Project overview and setup
+└── .gitignore                      # Git ignore rules
+```
+
+## Directory Guidelines
+
+### 📚 Documentation (`docs/`)
+**Purpose:** Centralized project documentation and specifications
+**Contents:**
+- Product requirements and user stories
+- System architecture and design decisions
+- Technical specifications and implementation details
+- API documentation and database schemas
+
+**Guidelines:**
+- Keep documentation up-to-date with code changes
+- Use clear, concise language
+- Include diagrams and examples where helpful
+- Version control all documentation changes
+
+### 📋 Task Management (`tasks/`)
+**Purpose:** Project planning, task tracking, and development context
+**Contents:**
+- Task backlog and sprint planning
+- Current development focus and priorities
+- Progress tracking and metrics
+- Issue tracking and resolution
+
+**Guidelines:**
+- Update task status regularly
+- Document decisions and rationale
+- Track progress and blockers
+- Maintain active context for development
+
+### 🤖 Cursor Rules (`.cursor/rules/`)
+**Purpose:** AI-assisted development rules and guidelines
+**Contents:**
+- Core development principles and standards
+- Planning and task management guidelines
+- Implementation best practices
+- Debugging and troubleshooting guides
+- Memory and knowledge management
+
+**Guidelines:**
+- Keep rules specific and actionable
+- Update rules based on project evolution
+- Ensure rules are consistent across files
+- Document rationale for rule changes
+
+### 🖥️ Backend (`backend/`)
+**Purpose:** Server-side application logic and API endpoints
+**Contents:**
+- Express.js server configuration
+- API route handlers and middleware
+- Business logic services
+- Database integration and utilities
+
+**Guidelines:**
+- Follow RESTful API design principles
+- Implement proper error handling and validation
+- Use environment variables for configuration
+- Maintain separation of concerns
+
+### 🎨 Frontend Assets (`assets/`)
+**Purpose:** Client-side resources and application logic
+**Contents:**
+- CSS stylesheets and styling
+- JavaScript modules and classes
+- Configuration and constants
+- API communication layer
+
+**Guidelines:**
+- Use modern JavaScript features (ES6+)
+- Implement responsive design principles
+- Follow consistent naming conventions
+- Optimize for performance and accessibility
+
+## File Organization Principles
+
+### 1. Separation of Concerns
+- **Backend:** Server logic, API endpoints, database operations
+- **Frontend:** User interface, client-side logic, user interactions
+- **Documentation:** Project specifications, architecture, technical details
+- **Configuration:** Environment settings, build configurations
+
+### 2. Modular Architecture
+- **Services:** Reusable business logic components
+- **Routes:** API endpoint definitions and handlers
+- **Middleware:** Cross-cutting concerns and utilities
+- **Utils:** Helper functions and common operations
+
+### 3. Scalability Considerations
+- **Horizontal Scaling:** Stateless backend design
+- **Database Scaling:** Optimized queries and indexing
+- **Frontend Scaling:** Modular JavaScript architecture
+- **Documentation Scaling:** Structured documentation system
+
+## Naming Conventions
+
+### Files and Directories
+- **Directories:** lowercase with hyphens (`my-recipes`, `saved-recipes`)
+- **JavaScript Files:** camelCase (`myRecipes.js`, `savedRecipes.js`)
+- **CSS Files:** lowercase with hyphens (`styles.css`)
+- **HTML Files:** lowercase with hyphens (`my-recipes.html`)
+
+### Code Elements
+- **Variables:** camelCase (`userName`, `recipeData`)
+- **Functions:** camelCase (`generateRecipe`, `saveRecipe`)
+- **Classes:** PascalCase (`RecipeFinder`, `AuthManager`)
+- **Constants:** UPPER_SNAKE_CASE (`API_BASE_URL`, `MAX_RECIPES`)
+
+### Database Elements
+- **Tables:** snake_case (`saved_recipes`, `recipe_cache`)
+- **Columns:** snake_case (`user_id`, `created_at`)
+- **Indexes:** descriptive names (`idx_user_recipes`, `idx_ingredients_hash`)
+
+## File Structure Best Practices
+
+### 1. Consistent Organization
+- Group related files together
+- Use descriptive directory names
+- Maintain consistent file naming
+- Keep directory depth reasonable (max 3-4 levels)
+
+### 2. Clear Dependencies
+- Minimize cross-directory dependencies
+- Use clear import/require statements
+- Avoid circular dependencies
+- Document external dependencies
+
+### 3. Maintainability
+- Keep files focused and single-purpose
+- Use meaningful file and directory names
+- Include README files for complex directories
+- Regular cleanup of unused files
+
+### 4. Version Control
+- Use `.gitignore` to exclude sensitive files
+- Commit related changes together
+- Use descriptive commit messages
+- Maintain clean commit history
+
+## Development Workflow
+
+### 1. Feature Development
+```
+1. Create feature branch from main
+2. Implement changes in appropriate directories
+3. Update documentation if needed
+4. Test changes thoroughly
+5. Create pull request for review
+6. Merge to main after approval
+```
+
+### 2. File Creation Guidelines
+- **New Features:** Create in appropriate service/route files
+- **New Pages:** Create HTML file and corresponding JS module
+- **New Styles:** Add to existing CSS files or create new ones
+- **New Documentation:** Add to appropriate docs directory
+
+### 3. Code Organization
+- **Backend Routes:** One file per resource type
+- **Frontend Modules:** One file per major functionality
+- **Services:** One file per external service integration
+- **Utilities:** One file per utility category
+
+## Directory-Specific Guidelines
+
+### Backend Directory
+```
+backend/
+├── server.js              # Main server file - keep minimal
+├── routes/                # API endpoints - one file per resource
+├── services/              # Business logic - one file per service
+├── middleware/            # Express middleware - one file per concern
+├── utils/                 # Helper functions - one file per category
+└── package.json           # Dependencies and scripts
+```
+
+### Frontend Assets
+```
+assets/
+├── css/
+│   └── styles.css         # Main stylesheet - organize by sections
+└── js/
+    ├── app.js             # Main application - keep minimal
+    ├── api.js             # API communication - all API calls
+    ├── auth.js            # Authentication - user management
+    ├── config.js          # Configuration - constants and settings
+    ├── landing.js         # Landing page - specific functionality
+    ├── myRecipes.js       # My Recipes - page-specific logic
+    └── savedRecipes.js    # Saved Recipes - API client
+```
+
+### Documentation
+```
+docs/
+├── product_requirement_docs.md  # Product specs and requirements
+├── architecture.md              # System design and architecture
+└── technical.md                 # Technical implementation details
+```
+
+## Maintenance Guidelines
+
+### 1. Regular Cleanup
+- Remove unused files and dependencies
+- Update documentation to reflect current state
+- Clean up old branches and temporary files
+- Optimize file sizes and performance
+
+### 2. Documentation Updates
+- Update docs when adding new features
+- Keep architecture docs current
+- Document breaking changes
+- Maintain API documentation
+
+### 3. Code Organization
+- Refactor large files into smaller modules
+- Extract common functionality into utilities
+- Maintain consistent coding standards
+- Regular code review and cleanup
+
+### 4. Performance Optimization
+- Optimize file loading and bundling
+- Minimize dependencies and file sizes
+- Use efficient directory structures
+- Monitor and optimize build processes
+
+## Security Considerations
+
+### 1. Sensitive Files
+- Never commit `.env` files
+- Use `.gitignore` for sensitive data
+- Keep API keys in environment variables
+- Secure database credentials
+
+### 2. File Permissions
+- Set appropriate file permissions
+- Restrict access to sensitive directories
+- Use secure file upload handling
+- Validate file types and sizes
+
+### 3. Directory Security
+- Implement proper access controls
+- Use secure file serving
+- Validate file paths and names
+- Prevent directory traversal attacks
+
+## Best Practices Summary
+
+1. **Maintain Clear Structure** - Use consistent organization and naming
+2. **Separate Concerns** - Keep different types of code in appropriate directories
+3. **Document Changes** - Update documentation when modifying structure
+4. **Follow Conventions** - Use established naming and organization patterns
+5. **Optimize for Maintenance** - Structure for easy updates and modifications
+6. **Consider Scalability** - Design structure to support growth
+7. **Security First** - Implement proper security measures
+8. **Version Control** - Use proper git practices and ignore rules
+9. **Regular Cleanup** - Remove unused files and optimize structure
+10. **Team Collaboration** - Structure for multiple developers working together

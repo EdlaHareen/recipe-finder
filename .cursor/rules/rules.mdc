@@ -1,0 +1,259 @@
+---
+description: Core development rules for Recipe Finder project
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Recipe Finder - Core Development Rules
+
+## Project Context
+You are working on Recipe Finder, an AI-powered recipe generation platform that helps users create recipes from available ingredients. The project uses Node.js/Express backend, vanilla JavaScript frontend, Supabase for authentication and data storage, and OpenAI APIs for AI-powered features.
+
+## Core Principles
+
+### 1. Code Quality & Standards
+- Write clean, readable, and maintainable code
+- Follow consistent naming conventions (camelCase for variables, PascalCase for classes)
+- Add meaningful comments for complex logic
+- Use descriptive variable and function names
+- Implement proper error handling with try-catch blocks
+- Validate all user inputs on both frontend and backend
+
+### 2. Security First
+- Always validate and sanitize user inputs
+- Use proper authentication and authorization
+- Implement CORS protection
+- Hash passwords with bcrypt
+- Use JWT tokens for authentication
+- Never expose sensitive data in client-side code
+
+### 3. Performance Optimization
+- Implement caching strategies for recipes and API responses
+- Use localStorage for client-side data persistence
+- Optimize database queries and API calls
+- Implement lazy loading for images
+- Minimize bundle size and loading times
+
+### 4. User Experience
+- Provide clear feedback for all user actions
+- Implement loading states and progress indicators
+- Handle errors gracefully with user-friendly messages
+- Ensure responsive design for all devices
+- Maintain consistent navigation and UI patterns
+
+## Technology Stack
+
+### Frontend
+- **HTML5/CSS3**: Semantic markup and responsive design
+- **Vanilla JavaScript**: No framework dependencies, ES6+ features
+- **CSS Grid/Flexbox**: Modern layout techniques
+- **Local Storage API**: Client-side data persistence
+- **Fetch API**: HTTP requests
+
+### Backend
+- **Node.js/Express**: Server framework
+- **JWT**: Authentication tokens
+- **bcrypt**: Password hashing
+- **CORS**: Cross-origin resource sharing
+- **Helmet**: Security middleware
+
+### Database & Services
+- **Supabase**: PostgreSQL database with real-time features
+- **OpenAI APIs**: GPT-4o-mini, DALL-E 3, GPT-4o Vision
+- **SQLite**: Local development database
+
+## File Structure Guidelines
+
+### Frontend Files
+```
+assets/
+├── css/
+│   └── styles.css          # Main stylesheet
+├── js/
+│   ├── app.js              # Main application logic
+│   ├── api.js              # API communication
+│   ├── auth.js             # Authentication management
+│   ├── config.js           # Configuration constants
+│   ├── landing.js          # Landing page functionality
+│   ├── myRecipes.js        # My Recipes page logic
+│   └── savedRecipes.js     # Saved recipes API
+```
+
+### Backend Files
+```
+backend/
+├── server.js               # Main server file
+├── routes/                 # API route handlers
+├── services/               # Business logic services
+├── middleware/             # Express middleware
+├── utils/                  # Utility functions
+└── package.json            # Dependencies
+```
+
+## Development Guidelines
+
+### 1. Authentication Flow
+- Always check authentication status before making API calls
+- Use localStorage fallback for authentication tokens
+- Implement proper session management
+- Handle authentication errors gracefully
+
+### 2. API Development
+- Use RESTful API design principles
+- Implement proper HTTP status codes
+- Add request/response validation
+- Include comprehensive error handling
+- Use async/await for asynchronous operations
+
+### 3. Database Operations
+- Use parameterized queries to prevent SQL injection
+- Implement proper error handling for database operations
+- Use transactions for complex operations
+- Optimize queries for performance
+
+### 4. Frontend Development
+- Use modern JavaScript features (ES6+)
+- Implement proper event handling
+- Use CSS custom properties for theming
+- Ensure accessibility compliance
+- Test across different browsers
+
+## Error Handling Standards
+
+### Frontend Error Handling
+```javascript
+try {
+  // Operation
+  const result = await apiCall();
+  // Handle success
+} catch (error) {
+  console.error('Operation failed:', error);
+  showUserFriendlyError(error);
+  // Implement fallback if possible
+}
+```
+
+### Backend Error Handling
+```javascript
+const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+// Global error handler
+const errorHandler = (err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+};
+```
+
+## Testing Requirements
+
+### Manual Testing Checklist
+- [ ] Authentication flow (login/logout/signup)
+- [ ] Recipe generation with different ingredients
+- [ ] Recipe saving and retrieval
+- [ ] Navigation between pages
+- [ ] Error handling and user feedback
+- [ ] Mobile responsiveness
+- [ ] Cross-browser compatibility
+
+### Code Review Checklist
+- [ ] Code follows project conventions
+- [ ] Proper error handling implemented
+- [ ] Security considerations addressed
+- [ ] Performance optimizations applied
+- [ ] User experience considerations
+- [ ] Documentation updated
+
+## Performance Guidelines
+
+### Frontend Performance
+- Minimize DOM manipulations
+- Use event delegation for dynamic content
+- Implement lazy loading for images
+- Optimize CSS and JavaScript
+- Use localStorage for data persistence
+
+### Backend Performance
+- Implement caching strategies
+- Optimize database queries
+- Use connection pooling
+- Implement rate limiting
+- Monitor API response times
+
+## Security Guidelines
+
+### Authentication Security
+- Use strong JWT secrets
+- Implement proper token expiration
+- Validate tokens on every request
+- Use HTTPS in production
+- Implement proper logout functionality
+
+### Data Security
+- Sanitize all user inputs
+- Use parameterized queries
+- Implement proper CORS policies
+- Store sensitive data securely
+- Regular security audits
+
+## Documentation Requirements
+
+### Code Documentation
+- Document complex functions and classes
+- Include JSDoc comments for API functions
+- Maintain README files
+- Document configuration changes
+- Keep architecture documentation updated
+
+### API Documentation
+- Document all API endpoints
+- Include request/response examples
+- Document error codes and messages
+- Maintain API versioning
+- Include authentication requirements
+
+## Deployment Guidelines
+
+### Environment Configuration
+- Use environment variables for sensitive data
+- Separate development and production configs
+- Implement proper logging
+- Use process managers for production
+- Monitor application health
+
+### Database Management
+- Use migrations for schema changes
+- Implement proper backup strategies
+- Monitor database performance
+- Use connection pooling
+- Implement proper indexing
+
+## Monitoring & Maintenance
+
+### Application Monitoring
+- Monitor API response times
+- Track error rates and types
+- Monitor database performance
+- Track user engagement metrics
+- Monitor external API usage
+
+### Maintenance Tasks
+- Regular dependency updates
+- Security patch management
+- Performance optimization
+- Database cleanup
+- User feedback analysis
+
+## Best Practices Summary
+
+1. **Always validate inputs** on both frontend and backend
+2. **Implement proper error handling** with user-friendly messages
+3. **Use caching strategies** to improve performance
+4. **Maintain consistent code style** across the project
+5. **Test thoroughly** before deploying changes
+6. **Document important decisions** and changes
+7. **Monitor performance** and user experience
+8. **Keep dependencies updated** and secure
+9. **Implement proper logging** for debugging
+10. **Follow security best practices** throughout the application

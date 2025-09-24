@@ -1,0 +1,541 @@
+---
+description: Error documentation and reusable fixes for Recipe Finder
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Recipe Finder - Error Documentation & Reusable Fixes
+
+## Authentication Errors
+
+### Error: "Please sign in to view saved recipes"
+**Symptoms:**
+- User is logged in but sees authentication error
+- My Recipes page shows "Please sign in" message
+- 403 Forbidden errors in API calls
+
+**Root Cause:**
+Authentication check happens before auth manager is fully initialized
+
+**Solution:**
+```javascript
+// Add localStorage fallback for authentication
+const buildHeaders = async () => {
+  const headers = { 'Content-Type': 'application/json' };
+  
+  let token = null;
+  
+  // Try auth manager first
+  if (window.authManager && window.authManager.isLoggedIn()) {
+    token = window.authManager.getToken();
+  }
+  
+  // Fallback to localStorage
+  if (!token) {
+    const userData = localStorage.getItem('recipe_finder_user_data');
+    if (userData) {
+      try {
+        const parsed = JSON.parse(userData);
+        token = parsed.token;
+      } catch (e) {
+        console.warn('Failed to parse user data');
+      }
+    }
+  }
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return headers;
+};
+```
+
+**Prevention:**
+- Always implement localStorage fallback for authentication
+- Add retry mechanism for auth manager initialization
+- Include comprehensive debug logging
+
+### Error: "Access token required"
+**Symptoms:**
+- 401 Unauthorized errors
+- API calls fail with authentication error
+- User appears logged out unexpectedly
+
+**Root Cause:**
+Missing or invalid JWT token in API requests
+
+**Solution:**
+```javascript
+// Enhanced token validation
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    return res.status(403).json({ error: 'Invalid or expired token' });
+  }
+};
+```
+
+**Prevention:**
+- Always check token validity before API calls
+- Implement proper token refresh mechanism
+- Handle token expiration gracefully
+
+## Database Errors
+
+### Error: "Could not find the table 'public.saved_recipes'"
+**Symptoms:**
+- Database queries fail
+- "Table not found" errors in logs
+- API endpoints return 500 errors
+
+**Root Cause:**
+Database table doesn't exist or RLS policies are blocking access
+
+**Solution:**
+```sql
+-- Create the table if it doesn't exist
+CREATE TABLE IF NOT EXISTS saved_recipes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  recipe_data JSONB NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Disable RLS for debugging (if needed)
+ALTER TABLE saved_recipes DISABLE ROW LEVEL SECURITY;
+```
+
+**Prevention:**
+- Always check table existence before queries
+- Implement proper database migrations
+- Test database setup in development
+
+### Error: "new row violates row-level security policy"
+**Symptoms:**
+- Database insertions fail
+- 500 errors when saving recipes
+- RLS policy violation messages
+
+**Root Cause:**
+Row Level Security policies blocking data insertion
+
+**Solution:**
+```sql
+-- Option 1: Disable RLS (for debugging)
+ALTER TABLE saved_recipes DISABLE ROW LEVEL SECURITY;
+
+-- Option 2: Create permissive RLS policy
+CREATE POLICY "Allow all operations on saved_recipes" ON saved_recipes
+  FOR ALL USING (true) WITH CHECK (true);
+```
+
+**Prevention:**
+- Test RLS policies thoroughly
+- Implement proper user context in policies
+- Use service role for backend operations
+
+## API Errors
+
+### Error: "Cooking time must be between 5 and 480 minutes"
+**Symptoms:**
+- Recipe generation fails
+- OpenAI API returns validation error
+- Users see confusing error messages
+
+**Root Cause:**
+OpenAI API validation error for cooking time constraints
+
+**Solution:**
+```javascript
+// Enhanced OpenAI prompt with clear constraints
+const generateRecipe = async (ingredients, options = {}) => {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are a professional chef. Generate recipes based on available ingredients.
+                   IMPORTANT: Cooking times must be between 5 and 480 minutes.
+                   Return valid JSON format with realistic cooking times.`
+        },
+        {
+          role: "user",
+          content: `Create recipes using these ingredients: ${ingredients.join(', ')}`
+        }
+      ],
+      max_tokens: 2000,
+      temperature: 0.7
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error('OpenAI API error:', error);
+    
+    if (error.message.includes('Cooking time')) {
+      throw new Error('Recipe generation failed due to cooking time constraints. Please try again.');
+    }
+    
+    throw new Error('Recipe generation failed. Please try again.');
+  }
+};
+```
+
+**Prevention:**
+- Include clear constraints in AI prompts
+- Implement proper error handling for API responses
+- Provide user-friendly error messages
+
+### Error: "API rate limit exceeded"
+**Symptoms:**
+- Recipe generation fails
+- 429 status codes in API responses
+- Users see rate limit error messages
+
+**Root Cause:**
+Too many requests to OpenAI API
+
+**Solution:**
+```javascript
+// Implement rate limiting and caching
+const rateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // limit each IP to 10 requests per windowMs
+  message: 'Too many recipe generation requests. Please try again later.'
+});
+
+// Check cache before API call
+const getCachedRecipe = async (ingredients) => {
+  const cacheKey = generateCacheKey(ingredients);
+  const cached = await redis.get(cacheKey);
+  return cached ? JSON.parse(cached) : null;
+};
+```
+
+**Prevention:**
+- Implement aggressive caching
+- Use rate limiting middleware
+- Monitor API usage and costs
+
+## Frontend Errors
+
+### Error: "Failed to save recipe. Please try again."
+**Symptoms:**
+- Save button doesn't work
+- Recipe saving fails silently
+- User sees generic error message
+
+**Root Cause:**
+Multiple possible causes - authentication, database, or API issues
+
+**Solution:**
+```javascript
+// Enhanced error handling for recipe saving
+const saveRecipe = async (recipe) => {
+  try {
+    // Check authentication first
+    if (!window.authManager || !window.authManager.isLoggedIn()) {
+      throw new Error('Please log in to save recipes');
+    }
+
+    // Validate recipe data
+    if (!recipe || !recipe.title) {
+      throw new Error('Invalid recipe data');
+    }
+
+    // Make API call with proper error handling
+    const response = await fetch('/api/saved-recipes/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...window.authManager.getAuthHeaders()
+      },
+      body: JSON.stringify({ recipe })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to save recipe');
+    }
+
+    const result = await response.json();
+    showSuccess('Recipe saved successfully!');
+    return result;
+
+  } catch (error) {
+    console.error('Save recipe error:', error);
+    showError(error.message || 'Failed to save recipe. Please try again.');
+    throw error;
+  }
+};
+```
+
+**Prevention:**
+- Implement comprehensive error handling
+- Validate data before API calls
+- Provide specific error messages
+- Test all error scenarios
+
+### Error: "Generated recipes are not shown"
+**Symptoms:**
+- Recipes generate but don't display
+- Page shows loading state indefinitely
+- User sees empty results
+
+**Root Cause:**
+Recipe persistence issue - recipes not saved to localStorage
+
+**Solution:**
+```javascript
+// Implement recipe persistence
+const saveRecipesToStorage = (recipes) => {
+  try {
+    localStorage.setItem('recipe_finder_recipes', JSON.stringify(recipes));
+    console.log('💾 Saved recipes to storage:', recipes.length, 'recipes');
+  } catch (error) {
+    console.warn('Failed to save recipes to localStorage:', error);
+  }
+};
+
+const loadRecipesFromStorage = () => {
+  try {
+    const saved = localStorage.getItem('recipe_finder_recipes');
+    if (saved) {
+      const recipes = JSON.parse(saved);
+      console.log('📦 Loaded recipes from storage:', recipes.length, 'recipes');
+      return recipes;
+    }
+  } catch (error) {
+    console.warn('Failed to load recipes from localStorage:', error);
+  }
+  return [];
+};
+
+// Load recipes on page initialization
+const initializeApp = () => {
+  this.loadIngredientsFromStorage();
+  this.loadRecipesFromStorage();
+  this.bindEvents();
+  this.updateUI();
+  this.displayRecipes(this.currentRecipes);
+};
+```
+
+**Prevention:**
+- Always implement data persistence
+- Load saved data on page initialization
+- Handle localStorage errors gracefully
+
+## Performance Errors
+
+### Error: "Page loads slowly"
+**Symptoms:**
+- Long loading times
+- Unresponsive UI
+- Poor user experience
+
+**Root Cause:**
+Multiple factors - large bundle size, slow API calls, inefficient rendering
+
+**Solution:**
+```javascript
+// Implement lazy loading for images
+const lazyLoadImages = () => {
+  const images = document.querySelectorAll('img[data-src]');
+  const imageObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src');
+        imageObserver.unobserve(img);
+      }
+    });
+  });
+
+  images.forEach(img => imageObserver.observe(img));
+};
+
+// Implement debounced search
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+```
+
+**Prevention:**
+- Optimize bundle size
+- Implement lazy loading
+- Use efficient algorithms
+- Monitor performance metrics
+
+## Network Errors
+
+### Error: "Network request failed"
+**Symptoms:**
+- API calls fail
+- Users see network error messages
+- Offline functionality doesn't work
+
+**Root Cause:**
+Network connectivity issues or server unavailability
+
+**Solution:**
+```javascript
+// Implement retry logic with exponential backoff
+const retryWithBackoff = async (fn, maxRetries = 3) => {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (i === maxRetries - 1) throw error;
+      
+      const delay = Math.pow(2, i) * 1000; // Exponential backoff
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+};
+
+// Enhanced fetch with retry
+const fetchWithRetry = async (url, options = {}) => {
+  return retryWithBackoff(async () => {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response;
+  });
+};
+```
+
+**Prevention:**
+- Implement retry logic
+- Provide offline functionality
+- Handle network errors gracefully
+- Monitor network status
+
+## Common Error Patterns
+
+### Pattern 1: Authentication Timing Issues
+**Symptoms:** User appears logged out when they should be logged in
+**Solution:** Always implement localStorage fallback for authentication state
+**Prevention:** Test authentication flow thoroughly across different scenarios
+
+### Pattern 2: Database Connection Issues
+**Symptoms:** API calls fail with database errors
+**Solution:** Implement proper error handling and connection testing
+**Prevention:** Use connection pooling and proper error recovery
+
+### Pattern 3: API Rate Limiting
+**Symptoms:** External API calls fail with rate limit errors
+**Solution:** Implement caching and rate limiting
+**Prevention:** Monitor API usage and implement proper throttling
+
+### Pattern 4: Frontend State Management
+**Symptoms:** UI state doesn't match actual data state
+**Solution:** Implement proper state synchronization
+**Prevention:** Use consistent state management patterns
+
+## Error Monitoring and Logging
+
+### Frontend Error Logging
+```javascript
+// Global error handler
+window.addEventListener('error', (event) => {
+  console.error('Global error:', {
+    message: event.message,
+    filename: event.filename,
+    lineno: event.lineno,
+    colno: event.colno,
+    error: event.error
+  });
+  
+  // Send to logging service
+  logError({
+    type: 'javascript_error',
+    message: event.message,
+    stack: event.error?.stack,
+    url: window.location.href,
+    userAgent: navigator.userAgent
+  });
+});
+```
+
+### Backend Error Logging
+```javascript
+// Enhanced error logging
+const logError = (error, context = {}) => {
+  console.error('Error occurred:', {
+    timestamp: new Date().toISOString(),
+    error: error.message,
+    stack: error.stack,
+    context
+  });
+  
+  // Send to external logging service if configured
+  if (process.env.LOGGING_SERVICE) {
+    sendToLoggingService({
+      level: 'error',
+      message: error.message,
+      stack: error.stack,
+      context
+    });
+  }
+};
+```
+
+## Error Recovery Strategies
+
+### 1. Graceful Degradation
+- Provide fallback functionality when services fail
+- Show cached data when API is unavailable
+- Implement offline mode for basic functionality
+
+### 2. User Communication
+- Provide clear, actionable error messages
+- Explain what went wrong and how to fix it
+- Offer alternative actions when possible
+
+### 3. Automatic Recovery
+- Implement retry logic for transient failures
+- Use circuit breakers for failing services
+- Provide automatic fallback mechanisms
+
+### 4. Monitoring and Alerting
+- Track error rates and patterns
+- Set up alerts for critical errors
+- Monitor user experience metrics
+
+## Best Practices for Error Handling
+
+1. **Fail Fast** - Detect errors early and handle them immediately
+2. **Fail Gracefully** - Provide fallback functionality when possible
+3. **Log Everything** - Comprehensive logging for debugging
+4. **User-Friendly Messages** - Clear, actionable error messages
+5. **Monitor and Alert** - Track errors and notify when needed
+6. **Test Error Scenarios** - Include error cases in testing
+7. **Document Solutions** - Keep record of fixes for future reference
+8. **Prevent Recurrence** - Implement safeguards to prevent similar errors
+9. **Regular Review** - Periodically review and update error handling
+10. **Continuous Improvement** - Learn from errors and improve processes
