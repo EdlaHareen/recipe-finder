@@ -10,65 +10,229 @@
 <body>
     <header class="header">
         <div class="container">
-            <h1 class="logo">🍳 Recipe Finder</h1>
-            <p class="tagline">Discover recipes with ingredients you have</p>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="logo">🍳 Recipe Finder</h1>
+                    <p class="tagline">Discover recipes with ingredients you have</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-menu" id="user-menu" style="display: none;">
+                        <div class="user-info">
+                            <span class="user-name" id="user-name">User</span>
+                            <button class="btn btn-secondary btn-sm" id="logout-btn">Logout</button>
+                        </div>
+                    </div>
+                    <div class="auth-buttons" id="auth-buttons">
+                        <button class="btn btn-secondary" id="login-btn">Sign In</button>
+                        <button class="btn btn-primary" id="signup-btn">Sign Up</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
     <main class="main">
-        <div class="container">
-            <!-- Ingredient Input Section -->
-            <section class="ingredient-section">
-                <h2>Your Pantry</h2>
-
-                <div class="input-group">
-                    <input
-                        type="text"
-                        id="ingredient-input"
-                        placeholder="Add an ingredient (e.g., chicken, tomatoes)"
-                        class="ingredient-input"
-                        autocomplete="off"
-                        maxlength="50"
-                    >
-                    <button id="add-ingredient-btn" class="btn btn-primary">Add</button>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1 class="hero-title">
+                            Discover Amazing Recipes with 
+                            <span class="gradient-text">AI-Powered Intelligence</span>
+                        </h1>
+                        <p class="hero-subtitle">
+                            Simply add your ingredients and let our AI create personalized, delicious recipes for you. 
+                            No more wondering what to cook with what you have!
+                        </p>
+                        <div class="hero-buttons">
+                            <button class="btn btn-primary btn-large" id="get-started-btn">
+                                🚀 Get Started
+                            </button>
+                            <button class="btn btn-secondary btn-large" id="watch-demo-btn">
+                                📺 Watch Demo
+                            </button>
+                        </div>
+                        <div class="hero-stats">
+                            <div class="stat">
+                                <span class="stat-number">10K+</span>
+                                <span class="stat-label">Recipes Generated</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number">50K+</span>
+                                <span class="stat-label">Happy Cooks</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number">99%</span>
+                                <span class="stat-label">Satisfaction Rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="recipe-preview">
+                            <div class="preview-card">
+                                <div class="preview-image">
+                                    <div class="placeholder-image">🍳</div>
+                                </div>
+                                <div class="preview-content">
+                                    <h3>AI-Generated Recipe</h3>
+                                    <p>Created from your ingredients</p>
+                                    <div class="preview-badge">🤖 AI Powered</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="image-upload-section">
-                    <label for="image-input" class="image-upload-label">
-                        📷 Or upload an image of your ingredient
-                    </label>
-                    <input type="file" id="image-input" accept="image/*" class="image-input">
-                </div>
-
-                <div class="ingredients-list" id="ingredients-list">
-                    <!-- Dynamic ingredients will be added here -->
-                </div>
-
-                <button id="search-recipes-btn" class="btn btn-success" disabled>
-                    🔍 Find Recipes
-                </button>
-            </section>
-
-            <!-- Loading State -->
-            <div class="loading" id="loading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Searching for delicious recipes...</p>
             </div>
+        </section>
 
-            <!-- Error Message -->
-            <div class="error-message" id="error-message" style="display: none;">
-                <p>Something went wrong. Please try again.</p>
-            </div>
-
-            <!-- Recipe Results Section -->
-            <section class="results-section" id="results-section" style="display: none;">
-                <h2>Recipe Results</h2>
-                <div class="recipe-grid" id="recipe-grid">
-                    <!-- Dynamic recipe cards will be added here -->
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Why Choose Recipe Finder?</h2>
+                    <p>Experience the future of cooking with our cutting-edge AI technology</p>
                 </div>
-            </section>
-        </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI-Powered Generation</h3>
+                        <p>Our advanced AI creates unique, personalized recipes based on your exact ingredients and preferences.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📷</div>
+                        <h3>Image Recognition</h3>
+                        <p>Simply take a photo of your ingredients and let our AI identify them automatically.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Lightning Fast</h3>
+                        <p>Get recipe suggestions in seconds with our optimized caching system and smart algorithms.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3>Beautiful Images</h3>
+                        <p>Each recipe comes with stunning AI-generated images that will make your mouth water.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">👤</div>
+                        <h3>Personalized</h3>
+                        <p>Save your favorites, track your cooking history, and get recommendations tailored to your taste.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌍</div>
+                        <h3>Global Cuisines</h3>
+                        <p>Explore recipes from around the world - Italian, Asian, Mexican, and many more cuisines.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <h2>How It Works</h2>
+                    <p>Three simple steps to discover your next favorite recipe</p>
+                </div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Add Your Ingredients</h3>
+                            <p>Type in your ingredients or upload a photo. Our AI will recognize everything automatically.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>AI Generates Recipes</h3>
+                            <p>Our advanced AI creates multiple unique recipes tailored to your ingredients and preferences.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Cook & Enjoy</h3>
+                            <p>Follow the detailed instructions, see beautiful images, and enjoy your delicious meal!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Ready to Transform Your Cooking?</h2>
+                    <p>Join thousands of home cooks who are discovering amazing recipes with AI</p>
+                    <button class="btn btn-primary btn-large" id="cta-get-started">
+                        Start Cooking Now
+                    </button>
+                </div>
+            </div>
+        </section>
     </main>
+
+    <!-- Authentication Modal -->
+    <div class="modal" id="auth-modal" style="display: none;">
+        <div class="modal-content auth-modal-content">
+            <span class="close" id="auth-modal-close">&times;</span>
+            <div class="auth-container">
+                <!-- Login Form -->
+                <div class="auth-form" id="login-form">
+                    <h2>Welcome Back!</h2>
+                    <p class="auth-subtitle">Sign in to your account</p>
+                    
+                    <form id="login-form-element">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary auth-btn">Sign In</button>
+                    </form>
+                    
+                    <p class="auth-switch">
+                        Don't have an account? 
+                        <a href="#" id="show-signup">Sign up</a>
+                    </p>
+                </div>
+
+                <!-- Signup Form -->
+                <div class="auth-form" id="signup-form" style="display: none;">
+                    <h2>Join Recipe Finder!</h2>
+                    <p class="auth-subtitle">Create your account to save favorites</p>
+                    
+                    <form id="signup-form-element">
+                        <div class="form-group">
+                            <label for="signup-name">Full Name</label>
+                            <input type="text" id="signup-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-email">Email</label>
+                            <input type="email" id="signup-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-password">Password</label>
+                            <input type="password" id="signup-password" required minlength="6">
+                        </div>
+                        <button type="submit" class="btn btn-primary auth-btn">Create Account</button>
+                    </form>
+                    
+                    <p class="auth-switch">
+                        Already have an account? 
+                        <a href="#" id="show-login">Sign in</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Recipe Detail Modal -->
     <div class="modal" id="recipe-modal" style="display: none;">
@@ -89,6 +253,8 @@
     <!-- Scripts -->
     <script src="assets/js/config.js"></script>
     <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/landing.js"></script>
     <script src="assets/js/app.js"></script>
 </body>
 </html>

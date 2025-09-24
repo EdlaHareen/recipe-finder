@@ -1,6 +1,8 @@
 const express = require('express');
 const openaiService = require('../services/openaiService');
 const { getDatabase } = require('../utils/database');
+const crypto = require('crypto');
+const { getSupabaseClient, isSupabaseConfigured } = require('../services/supabaseClient');
 const router = express.Router();
 
 // Generate recipes based on ingredients using AI
@@ -51,15 +53,60 @@ router.post('/generate', async (req, res) => {
             });
         }
 
-        // Generate recipes using OpenAI
-        const result = await openaiService.generateRecipes(cleanIngredients, {
+        // Compute ingredients hash for caching
+        const ingredientsHash = crypto
+            .createHash('sha256')
+            .update(cleanIngredients.join(','))
+            .digest('hex');
+
+        // Try Supabase cache first
+        let cached = null;
+        if (isSupabaseConfigured()) {
+            const supabase = getSupabaseClient();
+            const { data: cacheRows } = await supabase
+                .from('recipe_cache')
+                .select('id, recipes')
+                .eq('ingredients_hash', ingredientsHash)
+                .limit(1)
+                .maybeSingle();
+
+            if (cacheRows && cacheRows.recipes) {
+                cached = cacheRows.recipes;
+                // best-effort increment access_count
+                supabase.from('recipe_cache')
+                    .update({ access_count: (cacheRows.access_count || 0) + 1 })
+                    .eq('id', cacheRows.id)
+                    .then(() => {}).catch(() => {});
+            }
+        }
+
+        let result;
+        if (cached) {
+            result = { success: true, data: cached, metadata: { cached: true, cacheHit: true } };
+        } else {
+            // Generate recipes using OpenAI
+            result = await openaiService.generateRecipes(cleanIngredients, {
             count: Math.min(count, 10), // Limit to 10 recipes max
             dietaryRestrictions,
             cuisineType,
             difficulty,
             cookingTime,
             servings
-        });
+            });
+
+            // Save to Supabase cache if configured
+            if (isSupabaseConfigured() && result.success) {
+                const supabase = getSupabaseClient();
+                await supabase
+                    .from('recipe_cache')
+                    .upsert({
+                        ingredients_hash: ingredientsHash,
+                        ingredients: cleanIngredients,
+                        recipes: result.data,
+                        access_count: 1
+                    }, { onConflict: 'ingredients_hash' });
+            }
+        }
 
         // Store search in database
         const db = getDatabase();

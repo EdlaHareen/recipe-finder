@@ -21,7 +21,8 @@ const CONFIG = {
     STORAGE: {
         INGREDIENTS: 'recipe_finder_ingredients',
         SESSION_ID: 'recipe_finder_session_id',
-        PREFERENCES: 'recipe_finder_preferences'
+        PREFERENCES: 'recipe_finder_preferences',
+        USER_DATA: 'recipe_finder_user_data'
     },
 
     // Application Settings

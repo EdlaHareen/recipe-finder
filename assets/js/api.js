@@ -39,10 +39,17 @@ class RecipeAPI {
     }
 
     buildHeaders() {
-        return {
+        const headers = {
             'Content-Type': 'application/json',
             'X-Session-ID': this.sessionId
         };
+
+        // Add authentication header if user is logged in
+        if (window.authManager && window.authManager.isLoggedIn()) {
+            headers['Authorization'] = `Bearer ${window.authManager.token}`;
+        }
+
+        return headers;
     }
 
     async makeRequest(endpoint, options = {}) {

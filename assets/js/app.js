@@ -704,4 +704,7 @@ class RecipeFinderApp {
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new RecipeFinderApp();
+    
+    // Make auth manager available globally
+    window.authManager = authManager;
 });
