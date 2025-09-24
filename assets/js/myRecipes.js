@@ -118,7 +118,7 @@ class MyRecipesPage {
             this.hideError();
             this.hideEmptyState();
 
-            console.log('🔍 Loading saved recipes...');
+            console.log('🔍 Loading SAVED recipes from database...');
             console.log('Current page:', this.currentPage);
             console.log('Recipes per page:', this.recipesPerPage);
             
@@ -135,11 +135,17 @@ class MyRecipesPage {
                 }
             }
 
+            // Only get recipes from database (manually saved ones)
             const result = await window.savedRecipesAPI.getMyRecipes(this.currentPage, this.recipesPerPage);
             
             if (result.success) {
                 this.savedRecipes = result.data.recipes;
                 this.totalPages = result.data.pagination.totalPages;
+                
+                console.log('📊 API Response:', result);
+                console.log('📋 Saved recipes count:', this.savedRecipes.length);
+                console.log('📄 Total pages:', this.totalPages);
+                console.log('🍳 Recipes from database:', this.savedRecipes.map(r => r.title));
                 
                 if (this.savedRecipes.length === 0) {
                     this.showEmptyState();
