@@ -164,17 +164,36 @@ class LandingPage {
         // Add typewriter effect to hero title
         const heroTitle = document.querySelector('.hero-title');
         if (heroTitle) {
-            const text = heroTitle.innerHTML;
+            // Store the original HTML content
+            const originalHTML = heroTitle.innerHTML;
+            
+            // Extract just the text content for typewriter effect
+            const textContent = heroTitle.textContent;
+            
+            // Clear the title and add cursor
             heroTitle.innerHTML = '';
             heroTitle.style.borderRight = '2px solid #ffd700';
             
             let i = 0;
             const typeWriter = () => {
-                if (i < text.length) {
-                    heroTitle.innerHTML += text.charAt(i);
+                if (i < textContent.length) {
+                    // Build the text up to current position
+                    const currentText = textContent.substring(0, i + 1);
+                    
+                    // Reconstruct the HTML with gradient text
+                    if (currentText.includes('AI-Powered Intelligence')) {
+                        const beforeGradient = currentText.substring(0, currentText.indexOf('AI-Powered Intelligence'));
+                        const gradientText = currentText.substring(currentText.indexOf('AI-Powered Intelligence'));
+                        heroTitle.innerHTML = beforeGradient + `<span class="gradient-text">${gradientText}</span>`;
+                    } else {
+                        heroTitle.innerHTML = currentText;
+                    }
+                    
                     i++;
                     setTimeout(typeWriter, 50);
                 } else {
+                    // Restore the full original HTML when done
+                    heroTitle.innerHTML = originalHTML;
                     setTimeout(() => {
                         heroTitle.style.borderRight = 'none';
                     }, 1000);

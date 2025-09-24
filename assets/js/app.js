@@ -22,25 +22,35 @@ class RecipeFinderApp {
         const ingredientInput = document.getElementById('ingredient-input');
         const addIngredientBtn = document.getElementById('add-ingredient-btn');
 
-        addIngredientBtn.addEventListener('click', () => this.addIngredient());
-        ingredientInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.addIngredient();
-            }
-        });
+        if (addIngredientBtn) {
+            addIngredientBtn.addEventListener('click', () => this.addIngredient());
+        }
+        if (ingredientInput) {
+            ingredientInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.addIngredient();
+                }
+            });
+        }
 
         // Debounced search for ingredient suggestions
-        ingredientInput.addEventListener('input', this.debounce((e) => {
-            this.handleIngredientInput(e);
-        }, 300));
+        if (ingredientInput) {
+            ingredientInput.addEventListener('input', this.debounce((e) => {
+                this.handleIngredientInput(e);
+            }, 300));
+        }
 
         // Image upload event
         const imageInput = document.getElementById('image-input');
-        imageInput.addEventListener('change', (e) => this.handleImageUpload(e));
+        if (imageInput) {
+            imageInput.addEventListener('change', (e) => this.handleImageUpload(e));
+        }
 
         // Search recipes button
         const searchBtn = document.getElementById('search-recipes-btn');
-        searchBtn.addEventListener('click', () => this.searchRecipes());
+        if (searchBtn) {
+            searchBtn.addEventListener('click', () => this.searchRecipes());
+        }
 
         // Modal events
         const modal = document.getElementById('recipe-modal');
