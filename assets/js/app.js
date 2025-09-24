@@ -14,6 +14,9 @@ class RecipeFinderApp {
         this.displayRecipes(this.currentRecipes);
         this.initializeLazyLoading();
         
+        // Clear old recipes with DALL-E URLs to force regeneration with new system
+        this.clearOldDalleRecipes();
+        
         console.log('🍳 Recipe Finder App initialized');
     }
 
