@@ -528,7 +528,9 @@ class RecipeFinderApp {
         if (recipe.imageUrl && recipe.imageUrl !== '') {
             // If it's a local upload URL, use it directly
             if (recipe.imageUrl.startsWith('/uploads/')) {
-                const localUrl = `${CONFIG.API.BASE_URL}${recipe.imageUrl}`;
+                // Use the base server URL without /api for static files
+                const baseUrl = CONFIG.API.BASE_URL.replace('/api', '');
+                const localUrl = `${baseUrl}${recipe.imageUrl}`;
                 console.log(`🖼️ Using local stored image for "${recipe.title}": ${localUrl}`);
                 return localUrl;
             }
