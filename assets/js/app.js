@@ -13,6 +13,10 @@ class RecipeFinderApp {
         this.updateUI();
         this.displayRecipes(this.currentRecipes);
         this.initializeLazyLoading();
+        
+        // Clear old recipes with DALL-E URLs to force regeneration with new system
+        this.clearOldDalleRecipes();
+        
         console.log('🍳 Recipe Finder App initialized');
     }
 
@@ -499,6 +503,24 @@ class RecipeFinderApp {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    clearOldDalleRecipes() {
+        // Check if any recipes have old DALL-E URLs
+        const hasOldRecipes = this.currentRecipes.some(recipe => 
+            (recipe.imageUrl && recipe.imageUrl.includes('oaidalleapiprodscus.blob.core.windows.net')) ||
+            (recipe.image && recipe.image.includes('oaidalleapiprodscus.blob.core.windows.net'))
+        );
+
+        if (hasOldRecipes) {
+            console.log('🧹 Clearing old recipes with DALL-E URLs to use new local storage system');
+            this.currentRecipes = [];
+            this.saveRecipesToStorage([]);
+            this.displayRecipes([]);
+            
+            // Show a message to the user
+            this.showNotification('Old recipes cleared. Generate new recipes to see images!', 'info');
+        }
     }
 
     getRecipeImageUrl(recipe) {
