@@ -275,6 +275,10 @@ class MyRecipesPage {
         
         if (!modal || !modalBody) return;
 
+        // Debug: Log the recipe data to see the ingredient format
+        console.log('🍳 Recipe data for modal:', recipeData);
+        console.log('🥕 Ingredients data:', recipeData.ingredients);
+
         modalBody.innerHTML = `
             <div class="recipe-detail">
                 <h2>${this.escapeHtml(recipeTitle)}</h2>
@@ -295,9 +299,19 @@ class MyRecipesPage {
                     <div class="ingredients-section">
                         <h3>Ingredients</h3>
                         <ul class="ingredients-list">
-                            ${recipeData.ingredients.map(ing => `
-                                <li>${this.escapeHtml(ing.name || ing.original || ing)}</li>
-                            `).join('')}
+                            ${recipeData.ingredients.map(ing => {
+                                // Handle different ingredient formats
+                                let ingredientText = '';
+                                if (typeof ing === 'string') {
+                                    ingredientText = ing;
+                                } else if (typeof ing === 'object' && ing !== null) {
+                                    // Try different possible property names
+                                    ingredientText = ing.name || ing.original || ing.item || ing.nameClean || ing.ingredient || JSON.stringify(ing);
+                                } else {
+                                    ingredientText = String(ing);
+                                }
+                                return `<li>${this.escapeHtml(ingredientText)}</li>`;
+                            }).join('')}
                         </ul>
                     </div>
                 ` : ''}
